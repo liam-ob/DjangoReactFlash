@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+.venv
+.pytest_cache
+.idea
+
+.run
+*.log
+*.env
+.env.*
+*.env.*
+*.coverage
+
+*.sqlite3
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
