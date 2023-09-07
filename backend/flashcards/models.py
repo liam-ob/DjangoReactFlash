@@ -12,6 +12,7 @@ class FlashcardStack(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     public = models.BooleanField()
     category = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
@@ -45,3 +46,6 @@ class Priority(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     flashcard = models.ForeignKey(Flashcard, on_delete=models.CASCADE)
     priority = models.IntegerField(default=1)
+
+    class Meta:
+        unique_together = ('author', 'flashcard')

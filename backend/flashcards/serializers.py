@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from core.serializers import GetUserSerializer
+from core.serializers import UserSerializer
 from .models import FlashcardStack, Flashcard, Priority
 
 
 class FlashcardStackSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    author = GetUserSerializer(read_only=True, required=False)
+    author = UserSerializer(read_only=True, required=False)
     public = serializers.BooleanField()
     category = serializers.CharField(max_length=200)
     difficulty = serializers.CharField(max_length=20)
