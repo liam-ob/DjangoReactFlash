@@ -21,4 +21,6 @@ urlpatterns = [
     path('api/admin/', admin.site.urls),
     path('api/flashcards/', include('flashcards.urls', namespace='flashcards')),
     path('api/core/', include('core.urls', namespace='core')),
+    path('api/core/users/api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # provides /login/ and /logout/ endpoints
 ]

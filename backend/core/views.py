@@ -1,20 +1,29 @@
-from rest_framework import views, response, exceptions, generics, permissions, authentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework import views, response, exceptions, generics, permissions
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-
-from .authentication import create_token, CustomUserAuthentication
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer
 
 
+class UserList(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-class UserDetailAPI(views.APIView):
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
 
-    def get(self,request,*args,**kwargs):
-        user = User.objects.get(id=request.user.id)
-        serializer = UserSerializer(user)
-        return response.Response(serializer.data)
+class UserDetail(generics.RetrieveAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def delete(self, request, *args, **kwargs):
+        user = User.objects.get(pk=self.kwargs['pk'])
+        if user != request.user:
+            raise exceptions.PermissionDenied("You can't delete another user.")
+        return super(UserDetail, self).delete(request, *args, **kwargs)
 
 
 class RegisterUserAPIView(generics.CreateAPIView):
@@ -22,49 +31,24 @@ class RegisterUserAPIView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
+class LoginView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        resp = super(LoginView, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=resp.data['token'])
+        user = token.user
+        resp2 = response.Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email,
+            'username': user.username,
+        })
+        return resp2
 
 
-
-class UserList(generics.ListAPIView, generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-
-
-class UserDetail(generics.RetrieveAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [CustomUserAuthentication]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class UserLogin(views.APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-
-        user = User.objects.filter(email=request.data['email']).first()
-        user = authenticate(request, username=user.username, password=request.data['password'])
-        if user is None:
-            raise exceptions.AuthenticationFailed('Invalid Credentials')
-
-
-        resp = response.Response()
-        resp.set_cookie(key='jwt', value=create_token(user_id=request.user.id), httponly=True)
-
-        return resp
-
-
-class UserLogout(views.APIView):
-    authentication_classes = (CustomUserAuthentication,)  # requires authentication
+class LogoutView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def post(self, request):
-        resp = response.Response()
-
-        resp.delete_cookie("jwt")
-
-        resp.data = {"message": f"Goodbye {request.user.username}!"}
-
-        return resp
-
+        request.user.auth_token.delete()
+        return response.Response(status=204)
