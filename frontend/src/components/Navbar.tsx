@@ -5,26 +5,6 @@ interface NavbarProps {
     apiURL: string;
 }
 
-// Does this even work??
-const fetchAPI = (url: string, my_function: () => void) => {
-    fetch(url)
-        .then((response) => {
-            if (response.status !== 200) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then((data) => {
-            my_function();
-        })
-        .catch((error) => {
-            console.error(
-                "There has been a problem with your fetch operation:",
-                error
-            );
-        });
-};
-
 const Navbar = ({ apiURL }: NavbarProps) => {
     const [user, setUser] = useState({
         username: "",
@@ -33,7 +13,18 @@ const Navbar = ({ apiURL }: NavbarProps) => {
     });
 
     const onClickLogin = () => {
-        fetch(apiURL + "/api/core/login")
+        fetch(apiURL + "/api/core/users/login/", {
+            method: "post",
+            credentials: "same-origin",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: "admin",
+                password: "admin",
+            }),
+        })
             .then((response) => {
                 if (response.status !== 200) {
                     throw new Error("Network response was not ok");
@@ -41,6 +32,7 @@ const Navbar = ({ apiURL }: NavbarProps) => {
                 return response.json();
             })
             .then((data) => {
+                console.log(data);
                 setUser(data);
             })
             .catch((error) => {
@@ -51,7 +43,7 @@ const Navbar = ({ apiURL }: NavbarProps) => {
             });
     };
     const onClickLogout = () => {
-        fetch(apiURL + "/api/core/logout")
+        fetch(apiURL + "/api/core/users/logout/")
             .then((response) => {
                 if (response.status !== 200) {
                     throw new Error("Network response was not ok");
@@ -60,6 +52,7 @@ const Navbar = ({ apiURL }: NavbarProps) => {
             })
             .then((data) => {
                 setUser({ ...user, username: "" });
+                console.log(data);
             })
             .catch((error) => {
                 console.error(
