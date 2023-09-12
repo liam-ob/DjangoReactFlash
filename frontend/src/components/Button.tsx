@@ -9,12 +9,25 @@ interface ButtonProps {
         | "info"
         | "light"
         | "dark";
-    onClick: () => void;
+    type?: "button" | "submit" | "reset";
+    onClick?: () => void;
+    disabled?: boolean;
 }
 
-const Button = ({ text, colour = "primary", onClick }: ButtonProps) => {
+const Button = ({
+    text,
+    colour = "primary",
+    onClick = () => {},
+    type = "button",
+    disabled = false,
+}: ButtonProps) => {
     return (
-        <button type="button" className={"btn btn-" + colour} onClick={onClick}>
+        <button
+            type={type}
+            className={"btn btn-" + colour}
+            onClick={onClick}
+            disabled={disabled}
+        >
             {text}
         </button>
     );
