@@ -11,7 +11,6 @@ class FlashcardStack(models.Model):
     ]
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     public = models.BooleanField()
-    category = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
     date_created = models.DateTimeField(auto_now_add=True)

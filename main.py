@@ -14,13 +14,12 @@ class MyObject():
     def __repr__(self):
         return self.name
 
+    def blah(self):
+        return self.name
+
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
-    my_list = [MyObject(1, 'one'), MyObject(2, 'two'), MyObject(3, 'three')]
-    new_my_list = []
-    for item in my_list:
-        new_my_list.extend([item] * item.number)
-    print(new_my_list)
+    print(dir(MyObject))
 
 
 # Press the green button in the gutter to run the script.

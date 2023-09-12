@@ -1,5 +1,4 @@
 import Button from "./Button";
-import React, { FormEvent, useRef } from "react";
 import { useForm, FieldValues } from "react-hook-form";
 
 interface LoginFormProps {}
@@ -25,7 +24,7 @@ const LoginForm = () => {
                         Email
                     </label>
                     <input
-                        {...register("name", {
+                        {...register("email", {
                             required: true,
                             validate: emailValidation,
                             minLength: 5,
