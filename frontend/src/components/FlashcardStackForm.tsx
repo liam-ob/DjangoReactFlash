@@ -32,7 +32,10 @@ const FlashcardStackForm = ({ apiURL }: FlashcardStackFormProps) => {
     return (
         <>
             {error != "" && <p className="text-danger">{error}</p>}
-            <form onSubmit={handleSubmit(onFormSubmit)}>
+            <form
+                onSubmit={handleSubmit(onFormSubmit)}
+                className="container-fluid text-start"
+            >
                 <div className="mb-3">
                     <input
                         {...register("publicFlashcardStack")}
@@ -42,41 +45,55 @@ const FlashcardStackForm = ({ apiURL }: FlashcardStackFormProps) => {
                         id="publicFlashcardStack"
                     ></input>
                     <label
-                        className="form-check-label"
+                        className="form-check-label px-3"
                         htmlFor="publicFlashcardStack"
                     >
                         Make this stack public
                     </label>
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="flashcardStackName" className="form-label">
-                        Flashcard Stack Name
-                    </label>
-                    <input
-                        {...register("flashcardStackName", { required: true })}
-                        id="flashcardStackName"
-                        type="text"
-                        className="form-control"
-                        placeholder="Flashcard Stack Name"
-                    />
-                    {formState.errors.flashcardStackName?.type ===
-                        "required" && <p>This field is required</p>}
+                <div className="row">
+                    <div className="col-md-9">
+                        <label
+                            htmlFor="flashcardStackName"
+                            className="form-label"
+                        >
+                            Flashcard Stack Name
+                        </label>
+                        <input
+                            {...register("flashcardStackName", {
+                                required: true,
+                            })}
+                            id="flashcardStackName"
+                            type="text"
+                            className="form-control"
+                            placeholder="Flashcard Stack Name"
+                        />
+                        {formState.errors.flashcardStackName?.type ===
+                            "required" && <p>This field is required</p>}
+                    </div>
+                    <div className="col-md-3">
+                        <label
+                            htmlFor="flashcardDifficulty"
+                            className="form-label"
+                        >
+                            Stack Difficulty
+                        </label>
+                        <select
+                            {...register("flashcardDifficulty", {
+                                required: true,
+                            })}
+                            className="form-select"
+                            id="flashcardDifficulty"
+                        >
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="flashcardDifficulty" className="form-label">
-                        Stack Difficulty
-                    </label>
-                    <select
-                        {...register("flashcardDifficulty", { required: true })}
-                        className="form-select"
-                        id="flashcardDifficulty"
-                    >
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
+                <div className="p-3">
+                    <Button text="Create Flashcard Stack" type="submit" />
                 </div>
-                <Button text="Create Flashcard Stack" type="submit" />
             </form>
         </>
     );

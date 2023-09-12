@@ -21,22 +21,31 @@ const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
     const [flashcardStacks, setFlashcardStacks] = useState<FlashcardStack[]>(
         []
     );
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const controller = new AbortController();
 
     useEffect(() => {
+        const controller = new AbortController();
+        setIsLoading(true);
         axios
             .get<FlashcardStack[]>(
                 apiURL + "api/flashcards/flashcardstacks/listcreate/",
                 { signal: controller.signal }
             )
-            .then((response) => setFlashcardStacks(response.data))
+            .then((response) => {
+                setFlashcardStacks(response.data);
+                setIsLoading(false);
+            })
             .catch((err) => {
                 if (err instanceof CanceledError) {
                     return;
                 }
+                setIsLoading(false);
                 setError(err.message);
+            })
+            // Doesnt work in strict mode?
+            .finally(() => {
+                setIsLoading(false);
             });
 
         return () => {
@@ -47,11 +56,14 @@ const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
     return (
         <>
             {error != "" && <p className="text-danger">{error}</p>}
-            <div className="container mb-3">
-                <h5>Flashcard Stacks</h5>
-                <Collapsible text="Create Flashcard Stack">
-                    <FlashcardStackForm apiURL={apiURL} />
-                </Collapsible>
+            {isLoading && <div className="spinner-border"></div>}
+            <div className="container-fluid text-center row">
+                <h5 className="col">Flashcard Stacks</h5>
+                <div className="col">
+                    <Collapsible text="Create Flashcard Stack">
+                        <FlashcardStackForm apiURL={apiURL} />
+                    </Collapsible>
+                </div>
             </div>
         </>
     );

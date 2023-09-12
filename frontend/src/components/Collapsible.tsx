@@ -47,12 +47,14 @@ const Collapsible: React.FC<CollapsibleProps> = ({
                         className="btn btn-primary"
                         onClick={handleFilterOpening}
                     >
-                        <span>{text} </span>
-                        {!isOpen ? (
-                            <BsCaretDownSquareFill />
-                        ) : (
-                            <BsFillCaretUpSquareFill />
-                        )}
+                        <span className="pe-3">{text}</span>
+                        <span>
+                            {!isOpen ? (
+                                <BsCaretDownSquareFill />
+                            ) : (
+                                <BsFillCaretUpSquareFill />
+                            )}
+                        </span>
                     </button>
                 </div>
                 <div className="my-collapsible" style={{ height }}>
