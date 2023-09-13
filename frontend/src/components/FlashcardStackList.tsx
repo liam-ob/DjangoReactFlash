@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, MouseEventHandler } from "react";
 import axios, { AxiosInstance, CanceledError } from "axios";
 import Button from "./Button";
 import FlashcardStackForm from "./FlashcardStackForm";
@@ -8,6 +8,7 @@ import { FieldValues } from "react-hook-form";
 
 interface FlashcardStackListProps {
     axiosInstance: AxiosInstance;
+    launchStack: (id: number) => MouseEventHandler<HTMLButtonElement>;
 }
 interface FlashcardStack {
     id: number;
@@ -22,7 +23,10 @@ interface FlashcardStack {
     date_modified: string;
 }
 
-const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
+const FlashcardStackList = ({
+    axiosInstance,
+    launchStack,
+}: FlashcardStackListProps) => {
     const [flashcardStacks, setFlashcardStacks] = useState<FlashcardStack[]>(
         []
     );
@@ -136,6 +140,12 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
                                 Last Updated : {flashcardStack.date_modified}
                             </small>
                         </p>
+                        <button
+                            className="btn btn-primary"
+                            onClick={launchStack(flashcardStack.id)}
+                        >
+                            Launch Stack
+                        </button>
 
                         <div className="card-footer text-muted d-flex justify-content-between">
                             {flashcardStack.author.username}
