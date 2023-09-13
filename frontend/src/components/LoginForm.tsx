@@ -1,47 +1,31 @@
 import Button from "./Button";
-import { useForm, FieldValues } from "react-hook-form";
+import { useForm, FieldValues, set } from "react-hook-form";
 
-interface LoginFormProps {}
+interface LoginFormProps {
+    onFormSubmit: (data: FieldValues) => void;
+}
 
-const LoginForm = () => {
+const LoginForm = ({ onFormSubmit }: LoginFormProps) => {
     const { register, handleSubmit, formState } = useForm();
-    let emailRegexExp = new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i);
-
-    const onFormSubmit = (data: FieldValues) => {
-        console.log(data);
-    };
-
-    const emailValidation = (email: string) => {
-        console.log("validate email called: " + email);
-        return emailRegexExp.test(email);
-    };
 
     return (
         <div className="container-sm">
             <form onSubmit={handleSubmit(onFormSubmit)}>
                 <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                        Email
+                    <label htmlFor="username" className="form-label">
+                        Username
                     </label>
                     <input
-                        {...register("email", {
+                        {...register("username", {
                             required: true,
-                            validate: emailValidation,
-                            minLength: 5,
                         })}
-                        id="email"
-                        type="email"
+                        id="username"
+                        type="username"
                         className="form-control"
-                        placeholder="Email"
+                        placeholder="username"
                     />
                     {formState.errors.username?.type === "required" && (
                         <p>This field is required!</p>
-                    )}
-                    {formState.errors.username?.type === "validate" && (
-                        <p>Invalid email!</p>
-                    )}
-                    {formState.errors.username?.type === "minLength" && (
-                        <p>Please make the email longer!</p>
                     )}
                 </div>
                 <div className="mb-3">

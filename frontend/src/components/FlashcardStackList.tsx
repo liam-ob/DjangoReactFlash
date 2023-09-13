@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import axios, { CanceledError } from "axios";
+import axios, { AxiosInstance, CanceledError } from "axios";
 import Button from "./Button";
 import FlashcardStackForm from "./FlashcardStackForm";
 import Collapsible from "./Collapsible";
+import { FaTrashAlt } from "react-icons/fa";
+import { FieldValues } from "react-hook-form";
 
 interface FlashcardStackListProps {
-    apiURL: string;
+    axiosInstance: AxiosInstance;
 }
 interface FlashcardStack {
     id: number;
-    author: string;
+    author: {
+        id: number;
+        username: string;
+    };
     public: boolean;
     name: string;
     difficulty: string;
@@ -17,7 +22,7 @@ interface FlashcardStack {
     date_modified: string;
 }
 
-const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
+const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
     const [flashcardStacks, setFlashcardStacks] = useState<FlashcardStack[]>(
         []
     );
@@ -27,9 +32,9 @@ const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
     useEffect(() => {
         const controller = new AbortController();
         setIsLoading(true);
-        axios
+        axiosInstance
             .get<FlashcardStack[]>(
-                apiURL + "api/flashcards/flashcardstacks/listcreate/",
+                "api/flashcards/flashcardstacks/listcreate/",
                 { signal: controller.signal }
             )
             .then((response) => {
@@ -53,6 +58,55 @@ const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
         };
     }, []);
 
+    const deleteStack = (flashcardStack: FlashcardStack) => {
+        // save current state in case of error
+        const origianalFlashcardStacks = [...flashcardStacks];
+        // provide instant feedback to user by removing flashcardStack from list
+        setFlashcardStacks(
+            flashcardStacks.filter((stack) => stack.id != flashcardStack.id)
+        );
+        axiosInstance
+            .delete("api/flashcards/flashcardstacks/" + flashcardStack.id + "/")
+            .catch((err) => {
+                setError(err.message);
+                setFlashcardStacks(origianalFlashcardStacks);
+            });
+    };
+
+    const createStack = (data: FieldValues) => {
+        const originalFlashcardStacks = [...flashcardStacks];
+        setFlashcardStacks([
+            ...flashcardStacks,
+            {
+                id: 0,
+                author: {
+                    id: 0,
+                    username: "",
+                },
+                public: data.public,
+                name: data.name,
+                difficulty: data.difficulty,
+                date_created: "",
+                date_modified: "",
+            },
+        ]);
+        axiosInstance
+            .post("api/flashcards/flashcardstacks/listcreate/", data)
+            .then((response) => {
+                if (response.status === 201) {
+                    console.log("Flashcard stack created!");
+                } else if (response.status === 403 || response.status === 401) {
+                    setError(
+                        "You are not authorized to create a flashcard stack!"
+                    );
+                }
+            })
+            .catch((err) => {
+                setError(err.message);
+                setFlashcardStacks(originalFlashcardStacks);
+            });
+    };
+
     return (
         <>
             {error != "" && <p className="text-danger">{error}</p>}
@@ -61,9 +115,39 @@ const FlashcardStackList = ({ apiURL }: FlashcardStackListProps) => {
                 <h5 className="col">Flashcard Stacks</h5>
                 <div className="col">
                     <Collapsible text="Create Flashcard Stack">
-                        <FlashcardStackForm apiURL={apiURL} />
+                        <FlashcardStackForm onFormSubmit={createStack} />
                     </Collapsible>
                 </div>
+            </div>
+            <div className="row row-cols-1 row-cols-md-3 g-4">
+                {flashcardStacks.map((flashcardStack) => (
+                    <div key={flashcardStack.id} className="card col h-100">
+                        <div className="card-body">
+                            <h5 className="card-title">
+                                {flashcardStack.name}
+                            </h5>
+                        </div>
+
+                        <p className="card-text">
+                            Difficulty : {flashcardStack.difficulty}
+                        </p>
+                        <p className="card-text">
+                            <small className="text-muted">
+                                Last Updated : {flashcardStack.date_modified}
+                            </small>
+                        </p>
+
+                        <div className="card-footer text-muted d-flex justify-content-between">
+                            {flashcardStack.author.username}
+                            <button
+                                className="btn btn-outline-danger"
+                                onClick={() => deleteStack(flashcardStack)}
+                            >
+                                <FaTrashAlt />
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
         </>
     );

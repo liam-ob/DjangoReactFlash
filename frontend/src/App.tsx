@@ -1,16 +1,20 @@
 import { useState } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import LoginForm from "./components/LoginForm";
 import FlashcardStackList from "./components/FlashcardStackList";
+import axios from "axios";
 
 function App() {
-    const [showAlert, setShowAlert] = useState(false);
-
+    const axiosInstance = axios.create({
+        baseURL: "http://localhost:8000/",
+        headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+    });
     return (
         <div>
-            <Navbar apiURL="http://localhost:8000/" />
-            <FlashcardStackList apiURL="http://localhost:8000/" />
+            <Navbar axiosInstance={axiosInstance} />
+            <FlashcardStackList axiosInstance={axiosInstance} />
         </div>
     );
 }
