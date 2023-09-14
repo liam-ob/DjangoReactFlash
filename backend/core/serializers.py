@@ -7,11 +7,9 @@ from flashcards.models import FlashcardStack
 
 
 class UserSerializer(serializers.ModelSerializer):
-    flashcards_stacks = serializers.PrimaryKeyRelatedField(many=True, queryset=FlashcardStack.objects.all(), required=False)
-
     class Meta:
         model = User
-        fields = ["id", "username", "flashcards_stacks"]
+        fields = ["id", "username"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

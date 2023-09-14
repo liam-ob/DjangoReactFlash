@@ -4,14 +4,14 @@ from core.serializers import UserSerializer
 from .models import FlashcardStack, Flashcard, Priority
 
 
-class FlashcardStackSerializer(serializers.HyperlinkedModelSerializer):
+class FlashcardStackSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     author = UserSerializer(read_only=True, required=False)
+    name = serializers.CharField(max_length=100)
     public = serializers.BooleanField()
-    category = serializers.CharField(max_length=200)
     difficulty = serializers.CharField(max_length=20)
-    date_created = serializers.DateTimeField(read_only=True)
-    date_modified = serializers.DateTimeField()
+    date_created = serializers.DateTimeField(read_only=True, required=False)
+    date_modified = serializers.DateTimeField(required=False)
 
     def create(self, validated_data):
         return FlashcardStack.objects.create(**validated_data)

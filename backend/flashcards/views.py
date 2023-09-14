@@ -1,5 +1,6 @@
 import random
-from rest_framework import views, permissions, response, status
+from rest_framework import views, permissions, response, status, exceptions
+from rest_framework.authentication import TokenAuthentication
 from django.db.models import Q, Count, Case, When, IntegerField
 
 from . import serializers
@@ -10,6 +11,7 @@ from .permissions import IsAuthorOrReadOnly
 class FlashcardStackListAllCreateAPIView(views.APIView):
     """List all flashcard stacks or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request):
         if request.user.is_anonymous:
@@ -20,6 +22,7 @@ class FlashcardStackListAllCreateAPIView(views.APIView):
         return response.Response(serializer.data)
 
     def post(self, request):
+        print(request.data)
         serializer = serializers.FlashcardStackSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
@@ -33,12 +36,16 @@ class FlashcardStackListAllCreateAPIView(views.APIView):
 class FlashcardStackDetailView(views.APIView):
     """Retrieve, update or delete a flashcard stack instance."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    authentication_classes = [TokenAuthentication]
 
     def get_object(self, pk):
         try:
-            return FlashcardStack.objects.get(pk=pk)
+            stack = FlashcardStack.objects.get(pk=pk)
         except FlashcardStack.DoesNotExist:
-            raise status.HTTP_404_NOT_FOUND
+            raise exceptions.NotFound
+        if stack.author != self.request.user and not stack.public:
+            raise exceptions.PermissionDenied
+        return stack
 
     def get(self, request, pk, format=None):
         flashcard_stack = self.get_object(pk)
@@ -62,6 +69,8 @@ class FlashcardStackDetailView(views.APIView):
 class FlashcardListAllCreateAPIView(views.APIView):
     """List all flashcards or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    authentication_classes = [TokenAuthentication]
+
 
     def get(self, pk, request):
         serializer = serializers.FlashcardSerializer(Flashcard.objects.filter(stack__pk=pk), many=True)
@@ -81,6 +90,8 @@ class FlashcardListAllCreateAPIView(views.APIView):
 class FlashcardDetailView(views.APIView):
     """Retrieve, update or delete a flashcard instance."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
+
 
     def get_object(self, pk):
         try:
@@ -110,6 +121,7 @@ class FlashcardDetailView(views.APIView):
 class WeightedFlashcard(views.APIView):
     """Retrieve a random flashcard based on the priority"""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
 
     def get(self, request, pk, format=None):
         flashcard_query = Flashcard.objects.filter(stack__pk=pk)

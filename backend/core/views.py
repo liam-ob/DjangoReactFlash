@@ -52,3 +52,16 @@ class LogoutView(views.APIView):
     def get(self, request):
         request.user.auth_token.delete()
         return response.Response(status=204)
+
+
+class CheckLogin(views.APIView):
+    authentication_classes = (TokenAuthentication,)
+
+    def post(self, request):
+        print(request.user.is_authenticated)
+        # If Authorized, return user
+        return response.Response({
+            'user_id': request.user.pk,
+            'username': request.user.username,
+        })
+

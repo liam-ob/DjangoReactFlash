@@ -4,50 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
-
-class CommonData:
-    user_data = {
-        'username': 'testuser',
-        'email': 'testuser@example.com',
-        'password': 'TestPassword',
-        'password2': 'TestPassword',
-    }
-    login_user_data = {
-        'username': user_data['username'],
-        'password': user_data['password'],
-    }
-    create_user_data = {
-        'username': user_data['username'],
-        'email': user_data['email'],
-        'password': user_data['password'],
-    }
-
-
-
-@pytest.fixture
-def create_user():
-    user_data = CommonData().user_data.copy()
-    user_data.pop('password2')
-
-    user = User.objects.create_user(**user_data)
-    assert User.objects.count() == 1
-    return user
-
-
-@pytest.fixture
-def user_client(create_user):
-    client = APIClient()
-    client.login(username=create_user.username, password=create_user.password)
-    return client
-
-
-@pytest.fixture
-def authenticated_client(create_user):
-    data = CommonData().user_data.copy()
-    client = APIClient()
-    client.post('/api/core/users/login/', data, format='json')
-    client.force_authenticate(user=create_user)
-    return client
+from conftest import CommonData
 
 
 @pytest.mark.django_db
@@ -138,7 +95,7 @@ class TestUser(CommonData):
         assert User.objects.count() == 2
 
     def test_client_can_logout(self, authenticated_client):
-        response = authenticated_client.post(path='/api/core/users/logout/', format='json')
+        response = authenticated_client.get(path='/api/core/users/logout/', format='json')
         assert response.status_code == 204
         assert Token.objects.count() == 0
 
