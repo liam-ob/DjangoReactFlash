@@ -1,10 +1,11 @@
 import pytest
+from django.db import IntegrityError
 
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
-from flashcards.models import FlashcardStack, Flashcard, Priority
+from flashcards.models import FlashcardStack, Flashcard, Priority, Blah
 from conftest import CommonData
 
 
