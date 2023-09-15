@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
-from flashcards.models import FlashcardStack, Flashcard, Priority, Blah
+from flashcards.models import FlashcardStack, Flashcard, Priority
 from conftest import CommonData
 
 
@@ -37,3 +37,10 @@ class TestFlashcardStack(CommonData):
         response = authenticated_client.get(path=f'/api/flashcards/flashcardstacks/{create_private_flashcard_stack2.id}/', format='json')
         assert response.status_code == 403
 
+    def test_author_can_update_their_own_stack(self, create_private_flashcard_stack, authenticated_client):
+        stack_data = {**self.create_private_flashcard_stack_data}
+        stack_data['name'] = 'brobeans'
+        type_of_stack_data = type(stack_data)
+        response = authenticated_client.put(path=f'/api/flashcards/flashcardstacks/{create_private_flashcard_stack.id}/', data=stack_data, format='json')
+        assert response.status_code == 200
+        assert response.data['name'] == 'brobeans'

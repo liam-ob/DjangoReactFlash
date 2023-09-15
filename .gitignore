@@ -3,8 +3,9 @@ __pycache__
 .venv
 .pytest_cache
 .idea
-
+.vscode
 .run
+
 *.log
 *.env
 .env.*

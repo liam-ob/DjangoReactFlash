@@ -54,7 +54,7 @@ class FlashcardStackDetailView(views.APIView):
 
     def put(self, request, pk, format=None):
         flashcard_stack = self.get_object(pk)
-        serializer = serializers.FlashcardStackSerializer(flashcard_stack, data=request.data)
+        serializer = serializers.FlashcardStackSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return response.Response(serializer.data)

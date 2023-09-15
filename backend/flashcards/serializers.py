@@ -18,7 +18,6 @@ class FlashcardStackSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.public = validated_data.get('public', instance.public)
-        instance.category = validated_data.get('category', instance.category)
         instance.difficulty = validated_data.get('difficulty', instance.difficulty)
         instance.date_modified = validated_data.get('date_modified', instance.date_modified)
         instance.save()
