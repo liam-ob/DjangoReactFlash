@@ -54,6 +54,7 @@ class FlashcardStackDetailView(views.APIView):
 
     def put(self, request, pk, format=None):
         flashcard_stack = self.get_object(pk)
+        flashcard_stack
         serializer = serializers.FlashcardStackSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -150,4 +151,3 @@ class WeightedFlashcard(views.APIView):
             serializer.save()
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

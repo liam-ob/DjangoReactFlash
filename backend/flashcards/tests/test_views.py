@@ -38,6 +38,7 @@ class TestFlashcardStack(CommonData):
         assert response.status_code == 403
 
     def test_author_can_update_their_own_stack(self, create_private_flashcard_stack, authenticated_client):
+        # fix this
         stack_data = {**self.create_private_flashcard_stack_data}
         stack_data['name'] = 'brobeans'
         type_of_stack_data = type(stack_data)
