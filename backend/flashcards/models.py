@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 # Create your models here.
 
 
@@ -18,15 +19,9 @@ class FlashcardStack(models.Model):
 
 
 class Flashcard(models.Model):
-    ANSWER_TYPE_CHOICES = [
-        ('text', 'text'),
-        ('image', 'image'),
-    ]
-
     stack = models.ForeignKey(FlashcardStack, on_delete=models.CASCADE)
 
     question = models.TextField()
-    answer_type = models.CharField(max_length=50, choices=ANSWER_TYPE_CHOICES)
     answer_img = models.ImageField(upload_to='images/', blank=True, null=True)
     answer_char = models.CharField(max_length=1000, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
