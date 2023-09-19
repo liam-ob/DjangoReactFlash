@@ -10,8 +10,8 @@ class FlashcardStackSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     public = serializers.BooleanField()
     difficulty = serializers.CharField(max_length=20)
-    date_created = serializers.DateTimeField(read_only=True, required=False)
-    date_modified = serializers.DateTimeField(required=False)
+    date_created = serializers.DateTimeField(read_only=True, required=False, format="%d %b %Y @ %H:%M")
+    date_modified = serializers.DateTimeField(required=False, format="%d %b %Y @ %H:%M")
 
     def create(self, validated_data):
         return FlashcardStack.objects.create(**validated_data)
@@ -31,8 +31,8 @@ class FlashcardSerializer(serializers.Serializer):
     question = serializers.CharField(max_length=1000)
     answer_img = serializers.ImageField(required=False)
     answer_char = serializers.CharField(max_length=1000, required=False)
-    date_created = serializers.DateTimeField(read_only=True)
-    date_modified = serializers.DateTimeField(required=False)
+    date_created = serializers.DateTimeField(read_only=True, format="%d %b %Y @ %H:%M")
+    date_modified = serializers.DateTimeField(required=False, format="%d %b %Y @ %H:%M")
 
     def is_valid(self, *, raise_exception=False):
         if not self.initial_data.get('answer_char') and not self.initial_data.get('answer_img'):
@@ -68,8 +68,8 @@ class FlashcardSerializerWithPriority(serializers.Serializer):
     question = serializers.CharField(max_length=1000)
     answer_img = serializers.ImageField(required=False)
     answer_char = serializers.CharField(max_length=1000, required=False)
-    date_created = serializers.DateTimeField(read_only=True)
-    date_modified = serializers.DateTimeField(required=False)
+    date_created = serializers.DateTimeField(read_only=True, format="%d %b %Y @ %H:%M")
+    date_modified = serializers.DateTimeField(required=False, format="%d %b %Y @ %H:%M")
     priority_id = serializers.IntegerField(required=False)
     user_priority = serializers.IntegerField(required=False)
 
