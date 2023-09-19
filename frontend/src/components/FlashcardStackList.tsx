@@ -3,14 +3,16 @@ import axios, { AxiosInstance, CanceledError } from "axios";
 import Button from "./Button";
 import FlashcardStackForm from "./FlashcardStackForm";
 import Collapsible from "./Collapsible";
+import FlashcardList from "./FlashcardList";
 import { FaTrashAlt } from "react-icons/fa";
 import { FieldValues } from "react-hook-form";
+import { toast } from "./toasts/ToastManager";
 
 interface FlashcardStackListProps {
     axiosInstance: AxiosInstance;
     launchStack: (id: number) => MouseEventHandler<HTMLButtonElement>;
 }
-interface FlashcardStack {
+export interface FlashcardStack {
     id: number;
     author: {
         id: number;
@@ -50,7 +52,11 @@ const FlashcardStackList = ({
                     return;
                 }
                 setIsLoading(false);
-                setError(err.message);
+                toast.show({
+                    title: "Error",
+                    content: "Failed to get flashcard stacks: " + err.message,
+                    duration: 5000,
+                });
             })
             // Doesnt work in strict mode?
             .finally(() => {
@@ -99,6 +105,7 @@ const FlashcardStackList = ({
             .then((response) => {
                 if (response.status === 201) {
                     console.log("Flashcard stack created!");
+                    setFlashcardStacks([response.data, ...flashcardStacks]);
                 } else if (response.status === 403 || response.status === 401) {
                     setError(
                         "You are not authorized to create a flashcard stack!"
@@ -126,10 +133,16 @@ const FlashcardStackList = ({
             <div className="row row-cols-1 row-cols-md-3 g-4">
                 {flashcardStacks.map((flashcardStack) => (
                     <div key={flashcardStack.id} className="card col h-100">
-                        <div className="card-body">
+                        <div className="card-body d-flex justify-content-between">
                             <h5 className="card-title">
                                 {flashcardStack.name}
                             </h5>
+                            <button
+                                className="btn btn-primary"
+                                onClick={launchStack(flashcardStack.id)}
+                            >
+                                Launch Stack
+                            </button>
                         </div>
 
                         <p className="card-text">
@@ -140,21 +153,25 @@ const FlashcardStackList = ({
                                 Last Updated : {flashcardStack.date_modified}
                             </small>
                         </p>
-                        <button
-                            className="btn btn-primary"
-                            onClick={launchStack(flashcardStack.id)}
-                        >
-                            Launch Stack
-                        </button>
 
-                        <div className="card-footer text-muted d-flex justify-content-between">
-                            {flashcardStack.author.username}
+                        <div className="text-muted d-flex justify-content-between pb-1">
+                            Author : {flashcardStack.author.username}
                             <button
                                 className="btn btn-outline-danger"
                                 onClick={() => deleteStack(flashcardStack)}
                             >
                                 <FaTrashAlt />
                             </button>
+                        </div>
+                        <div className="card-footer">
+                            <div className="text-center">
+                                <Collapsible text="Edit" color="success">
+                                    <FlashcardList
+                                        axiosInstance={axiosInstance}
+                                        stackID={flashcardStack.id}
+                                    />
+                                </Collapsible>
+                            </div>
                         </div>
                     </div>
                 ))}

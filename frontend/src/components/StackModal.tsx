@@ -1,32 +1,12 @@
 import { AxiosInstance } from "axios";
 import { useState, useEffect } from "react";
+import { toast } from "./toasts/ToastManager";
+import { Flashcard } from "./FlashcardList";
 
 interface StackModalProps {
     axiosInstance: AxiosInstance;
     stackID: number;
     closeStack: () => void;
-}
-interface FlashcardStack {
-    id: number;
-    author: {
-        id: number;
-        username: string;
-    };
-    public: boolean;
-    name: string;
-    difficulty: string;
-    date_created: string;
-    date_modified: string;
-}
-interface Flashcard {
-    id: number;
-    stack: FlashcardStack;
-    question: string;
-    answer_type: string;
-    answer_img: string;
-    answer_char: string;
-    date_created: string;
-    date_modified: string;
 }
 
 const StackModal = ({
@@ -34,9 +14,7 @@ const StackModal = ({
     stackID,
     closeStack,
 }: StackModalProps) => {
-    const [stack, setStack] = useState<FlashcardStack>();
     const [flashcard, setFlashcard] = useState<Flashcard>();
-    const [error, setError] = useState("");
     const [showAnswer, setShowAnswer] = useState(false);
 
     useEffect(() => {
@@ -45,16 +23,20 @@ const StackModal = ({
 
     const getNewFlashcard = () => {
         axiosInstance
-            .get(`api/flashcard/flashcard/weightedflashcard/`)
+            .get(`api/flashcard/flashcard/weightedflashcard/${stackID}/`)
             .then((res) => {
                 setFlashcard(res.data);
             })
             .catch((err) => {
-                setError(err.message);
+                toast.show({
+                    title: "Error",
+                    content: "Failed to get flashcard: " + err.message,
+                    duration: 5000,
+                });
             });
     };
 
-    const getNextFlashCard = () => {};
+    const postPriority = () => {};
 
     return (
         <div className="modal-dialog modal-xl" role="document">
@@ -78,6 +60,7 @@ const StackModal = ({
                     )}
                 </div>
                 <div className="modal-footer">
+                    <div className="text-start">Change Priority</div>
                     <div className="text-center">
                         <button className="btn btn-primary">-1</button>
                         <button className="btn btn-primary">+1</button>

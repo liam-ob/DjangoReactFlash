@@ -3,12 +3,22 @@ import { BsCaretDownSquareFill, BsFillCaretUpSquareFill } from "react-icons/bs";
 interface CollapsibleProps {
     open?: boolean;
     text: string;
+    color?:
+        | "primary"
+        | "secondary"
+        | "success"
+        | "danger"
+        | "warning"
+        | "info"
+        | "light"
+        | "dark";
     children: React.ReactNode;
 }
 
 const Collapsible: React.FC<CollapsibleProps> = ({
     open = false,
     children,
+    color = "primary",
     text,
 }) => {
     const [isOpen, setIsOpen] = useState(open);
@@ -44,7 +54,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
                 <div>
                     <button
                         type="button"
-                        className="btn btn-primary"
+                        className={"btn btn-" + color}
                         onClick={handleFilterOpening}
                     >
                         <span className="pe-3">{text}</span>
