@@ -154,10 +154,20 @@ def create_private_flashcard(create_private_flashcard_stack):
 
 
 @pytest.fixture
-def create_priority(create_user, create_public_flashcard):
+def create_public_priority(create_user, create_public_flashcard):
     priority = Priority.objects.create(
         author=create_user,
         flashcard=create_public_flashcard,
+        priority=9
+    )
+    return priority
+
+
+@pytest.fixture
+def create_private_priority(create_user, create_private_flashcard):
+    priority = Priority.objects.create(
+        author=create_user,
+        flashcard=create_private_flashcard,
         priority=9
     )
     return priority

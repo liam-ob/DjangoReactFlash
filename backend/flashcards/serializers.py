@@ -62,7 +62,36 @@ class FlashcardSerializer(serializers.Serializer):
         return instance
 
 
-class PrioritySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Priority
-        fields = ['id', 'priority']
+class FlashcardSerializerWithPriority(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    stack_id = serializers.IntegerField()
+    question = serializers.CharField(max_length=1000)
+    answer_img = serializers.ImageField(required=False)
+    answer_char = serializers.CharField(max_length=1000, required=False)
+    date_created = serializers.DateTimeField(read_only=True)
+    date_modified = serializers.DateTimeField(required=False)
+    priority_id = serializers.IntegerField(required=False)
+    user_priority = serializers.IntegerField(required=False)
+
+
+class PrioritySerializer(serializers.Serializer):
+    flashcard_id = serializers.IntegerField()
+    author = UserSerializer(read_only=True, required=False)
+    priority = serializers.IntegerField(required=True)
+
+    def is_valid(self, *, raise_exception=False):
+        try:
+            Flashcard.objects.get(id=self.initial_data.get('flashcard_id'))
+        except Flashcard.DoesNotExist:
+            raise serializers.ValidationError({'flashcard_id': 'please use a valid id'})
+        return super().is_valid(raise_exception=raise_exception)
+
+    def create(self, validated_data):
+        flashcard_id = validated_data.pop('flashcard_id')
+        validated_data['flashcard'] = Flashcard.objects.get(id=flashcard_id)
+        return Priority.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.priority = validated_data.get('priority', instance.priority)
+        instance.save()
+        return instance

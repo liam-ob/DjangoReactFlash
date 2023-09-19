@@ -222,7 +222,7 @@ class TestPriority(CommonData):
         assert Priority.objects.count() == 1
 
     def test_priority_is_calculated_correctly(self, create_public_flashcard_stack, create_public_flashcard,
-                                              authenticated_client, create_priority):
+                                              authenticated_client, create_public_priority):
         response = authenticated_client.get(
             path=f'/api/flashcards/flashcards/weightedflashcard/{create_public_flashcard_stack.id}/', format='json')
         assert response.status_code == 200
@@ -233,22 +233,47 @@ class TestPriority(CommonData):
             path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', format='json')
         assert response.status_code == 401
 
-    def test_authenticated_can_access_weighted_api(self, create_priority, create_private_flashcard,
+    def test_authenticated_can_access_weighted_api(self, create_public_priority, create_private_flashcard,
                                                    create_private_flashcard_stack, authenticated_client):
         response = authenticated_client.get(
             path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', format='json')
         assert response.status_code == 200
 
-    def test_weighted_api_returns_a_flashcard(self, create_priority, create_private_flashcard,
+    def test_weighted_api_returns_a_flashcard(self, create_public_priority, create_private_flashcard,
                                               create_private_flashcard_stack, authenticated_client):
         response = authenticated_client.get(
             path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', format='json')
         assert response.status_code == 200
-        assert response.data['id'] == create_private_flashcard_stack.flashcards.all()[0].id
+        assert response.data['id'] == create_private_flashcard.id
+
+    def test_cannot_get_weighted_api_for_empty_stack(self, create_public_priority, create_private_flashcard_stack, authenticated_client):
+        response = authenticated_client.get(
+            path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', format='json')
+        assert response.status_code == 404
+        assert response.data['detail'] == 'No flashcards found in this stack.'
+
+    def test_can_get_users_priority_id_from_weighted_api(self, create_private_priority, create_private_flashcard, authenticated_client):
+        response = authenticated_client.get(
+            path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard.stack.id}/', format='json')
+        assert response.status_code == 200
+        assert response.data['priority_id'] == create_private_priority.id
+
+    def test_can_get_user_priority_from_weighted_api(self, create_private_priority, create_private_flashcard, create_private_flashcard_stack, authenticated_client):
+        response = authenticated_client.get(
+            path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', format='json')
+        assert response.status_code == 200
+        assert response.data['user_priority'] == create_private_priority.priority
 
     # POST
-    def test_authenticated_can_post_to_weighted_api(self, create_priority, create_public_flashcard, create_private_flashcard_stack, authenticated_client):
-        data = {'id': create_priority.id, 'priority': 1, 'flashcard_id': create_public_flashcard.id}
+    def test_authenticated_can_post_to_weighted_api(self, create_public_priority, create_public_flashcard, authenticated_client):
+        data = {'id': create_public_priority.id, 'priority': 1, 'flashcard_id': create_public_flashcard.id}
         response = authenticated_client.post(
-            path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard_stack.id}/', data=data, format='json')
+            path=f'/api/flashcards/flashcards/weightedflashcard/{create_public_flashcard.id}/', data=data, format='json')
         assert response.status_code == 200
+
+    def test_authenticated_user_can_successfully_update_priority(self, create_private_priority, create_private_flashcard, authenticated_client):
+        data = {'id': create_private_priority.id, 'priority': 10, 'flashcard_id': create_private_flashcard.id}
+        response = authenticated_client.post(
+            path=f'/api/flashcards/flashcards/weightedflashcard/{create_private_flashcard.id}/', data=data, format='json')
+        assert response.status_code == 200
+        assert response.data['priority'] == 10

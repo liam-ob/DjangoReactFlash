@@ -136,6 +136,7 @@ class WeightedFlashcard(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
+    # pk here is the stack pk (different then the post)
     def get(self, request, pk, format=None):
         # Create a priority for the user if there isnt one already
         if not Priority.objects.filter(author=request.user, flashcard__stack__pk=pk).exists():
@@ -150,10 +151,16 @@ class WeightedFlashcard(views.APIView):
                 When(priority__author=request.user, then='priority__priority'),
                 default=1,
                 output_field=IntegerField(),
+            ),
+            priority_id=Case(
+                When(priority__author=request.user, then='priority__id'),
+                default=None,
+                output_field=IntegerField(),
             )
         )
         flashcard_list = list(flashcard_query)
-
+        if not flashcard_list:
+            raise exceptions.NotFound('No flashcards found in this stack.')
 
         # Apply weight by simply duplicating the flashcard in the list
         weighted_flashcard_list = []
@@ -162,12 +169,14 @@ class WeightedFlashcard(views.APIView):
 
         # Get a random flashcard
         flashcard = random.choice(weighted_flashcard_list)
-        serializer = serializers.FlashcardSerializer(flashcard)
+        serializer = serializers.FlashcardSerializerWithPriority(flashcard)
         return response.Response(serializer.data)
 
+    # pk here is the flashcard pk (different from get)
     def post(self, request, pk, format=None):
-        serializer = serializers.PrioritySerializer(data=request.data)
+        priority = Priority.objects.get(author=request.user, flashcard__pk=pk)
+        serializer = serializers.PrioritySerializer(priority, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.update(serializer.instance, request.data)
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
