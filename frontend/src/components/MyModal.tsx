@@ -30,32 +30,30 @@ const MyModal = ({
             >
                 {button_text}
             </button>
-            <Modal
-                show={show}
-                size={size}
-                onHide={() => {
-                    setShow(false);
-                }}
-                backdrop="static"
-                keyboard={false}
-            >
-                <ModalHeader>
-                    <ModalTitle>{title}</ModalTitle>
-                </ModalHeader>
+            {show && (
+                <Modal
+                    show={show}
+                    size={size}
+                    onHide={() => {
+                        setShow(false);
+                    }}
+                    backdrop="static"
+                    keyboard={false}
+                >
+                    <ModalHeader>
+                        <ModalTitle>{title}</ModalTitle>
+                        <button
+                            type="button"
+                            className="btn-close float-end"
+                            onClick={() => {
+                                setShow(false);
+                            }}
+                        ></button>
+                    </ModalHeader>
 
-                <ModalBody>{children}</ModalBody>
-
-                <ModalFooter>
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => {
-                            setShow(false);
-                        }}
-                    >
-                        Close
-                    </button>
-                </ModalFooter>
-            </Modal>
+                    <ModalBody>{children}</ModalBody>
+                </Modal>
+            )}
         </>
     );
 };

@@ -14,27 +14,10 @@ function App() {
     });
     const [stackID, setStackID] = useState<number>(0);
 
-    const launchStack = (id: number) => () => {
-        setStackID(id);
-    };
-    const closeStack = () => {
-        setStackID(0);
-    };
-
     return (
         <div>
             <Navbar axiosInstance={axiosInstance} />
-            <FlashcardStackList
-                axiosInstance={axiosInstance}
-                launchStack={launchStack}
-            />
-            {stackID !== 0 && (
-                <StackModal
-                    axiosInstance={axiosInstance}
-                    stackID={stackID}
-                    closeStack={closeStack}
-                />
-            )}
+            <FlashcardStackList axiosInstance={axiosInstance} />
         </div>
     );
 }

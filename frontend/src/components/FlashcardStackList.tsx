@@ -8,10 +8,10 @@ import { FaTrashAlt } from "react-icons/fa";
 import { FieldValues } from "react-hook-form";
 import { toast } from "./toasts/ToastManager";
 import MyModal from "./MyModal";
+import StackModal from "./StackModal";
 
 interface FlashcardStackListProps {
     axiosInstance: AxiosInstance;
-    launchStack: (id: number) => MouseEventHandler<HTMLButtonElement>;
 }
 export interface FlashcardStack {
     id: number;
@@ -26,10 +26,7 @@ export interface FlashcardStack {
     date_modified: string;
 }
 
-const FlashcardStackList = ({
-    axiosInstance,
-    launchStack,
-}: FlashcardStackListProps) => {
+const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
     const [flashcardStacks, setFlashcardStacks] = useState<FlashcardStack[]>(
         []
     );
@@ -139,12 +136,10 @@ const FlashcardStackList = ({
                                 <h5 className="card-title">
                                     {flashcardStack.name}
                                 </h5>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={launchStack(flashcardStack.id)}
-                                >
-                                    Launch Stack
-                                </button>
+                                <StackModal
+                                    axiosInstance={axiosInstance}
+                                    stackID={flashcardStack.id}
+                                />
                             </div>
 
                             <p className="card-text">
