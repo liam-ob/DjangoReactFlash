@@ -5,6 +5,7 @@ import Collapsible from "./Collapsible";
 import FlashcardForm from "./FlashcardForm";
 import { FaTrashAlt } from "react-icons/fa";
 import { FieldValues, set } from "react-hook-form";
+import MyModal from "./MyModal";
 
 interface FlashcardListProps {
     axiosInstance: AxiosInstance;
@@ -132,36 +133,44 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
 
     return (
         <>
-            <div className="row text-center">
-                <Collapsible text="Create Flashcard">
+            <div className="text-center ">
+                <MyModal
+                    button_text="Create Flashcard"
+                    title="Create Flashcard"
+                    size="lg"
+                >
                     <FlashcardForm onFormSubmit={createFlashcard} />
-                </Collapsible>
+                </MyModal>
             </div>
             {isLoading && <div className="spinner-border"></div>}
-            {flashcards.map((flashcard) => (
-                <div className="card" key={flashcard.id}>
-                    <div className="card-body">
-                        <h5 className="card-title">{flashcard.question}</h5>
-                        <p className="card-text">{flashcard.answer_char}</p>
-                        {flashcard?.answer_img && (
-                            <p className="card-text">{flashcard.answer_img}</p>
-                        )}
-                        <p className="card-text">
-                            Priority : {flashcard.priority_id}
-                        </p>
+            <div className="row row-cols-1 row-cols-4 g-4">
+                {flashcards.map((flashcard) => (
+                    <div className="card" key={flashcard.id}>
+                        <div className="card-body">
+                            <h5 className="card-title">{flashcard.question}</h5>
+                            <p className="card-text">{flashcard.answer_char}</p>
+                            {flashcard?.answer_img && (
+                                <p className="card-text">
+                                    {flashcard.answer_img}
+                                </p>
+                            )}
+                            <p className="card-text">
+                                Priority : {flashcard.priority_id}
+                            </p>
+                        </div>
+                        <div className="card-footer">
+                            <p>{flashcard.date_modified}</p>
+                            <button
+                                className="btn btn-outline-danger"
+                                onClick={() => deleteFlashcard(flashcard)}
+                            >
+                                <FaTrashAlt />
+                            </button>
+                            <button className="btn btn-primary">Edit</button>
+                        </div>
                     </div>
-                    <div className="card-footer">
-                        <p>{flashcard.date_modified}</p>
-                        <button
-                            className="btn btn-outline-danger"
-                            onClick={() => deleteFlashcard(flashcard)}
-                        >
-                            <FaTrashAlt />
-                        </button>
-                        <button className="btn btn-primary">Edit</button>
-                    </div>
-                </div>
-            ))}
+                ))}
+            </div>
         </>
     );
 };

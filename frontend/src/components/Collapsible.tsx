@@ -50,29 +50,25 @@ const Collapsible: React.FC<CollapsibleProps> = ({
 
     return (
         <>
-            <div className="">
-                <div>
-                    <button
-                        type="button"
-                        className={"btn btn-" + color}
-                        onClick={handleFilterOpening}
-                    >
-                        <span className="pe-3">{text}</span>
-                        <span>
-                            {!isOpen ? (
-                                <BsCaretDownSquareFill />
-                            ) : (
-                                <BsFillCaretUpSquareFill />
-                            )}
-                        </span>
-                    </button>
-                </div>
-                <div className="my-collapsible" style={{ height }}>
-                    <div ref={heightRef}>
-                        {isOpen && (
-                            <div className="card card-body">{children}</div>
+            <div>
+                <button
+                    type="button"
+                    className={"btn btn-" + color}
+                    onClick={handleFilterOpening}
+                >
+                    <span className="pe-3">{text}</span>
+                    <span>
+                        {!isOpen ? (
+                            <BsCaretDownSquareFill />
+                        ) : (
+                            <BsFillCaretUpSquareFill />
                         )}
-                    </div>
+                    </span>
+                </button>
+            </div>
+            <div className="my-collapsible" style={{ height }}>
+                <div ref={heightRef}>
+                    {isOpen && <div className="">{children}</div>}
                 </div>
             </div>
         </>

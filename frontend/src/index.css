@@ -7,6 +7,20 @@ body {
 }
 
 
+/* Bootstrap extra styling */
+.z-3 {
+    z-index: 3;
+}
+.overflow-x {
+    overflow-x: visible;
+}
+.flashcard-list {
+    width: 100vw;
+    position: relative;
+    flex-grow: 2;
+    left: calc(-50vw + 50%);
+}
+
 
 
 /* Toast Styling */

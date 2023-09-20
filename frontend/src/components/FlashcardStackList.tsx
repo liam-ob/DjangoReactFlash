@@ -7,6 +7,7 @@ import FlashcardList from "./FlashcardList";
 import { FaTrashAlt } from "react-icons/fa";
 import { FieldValues } from "react-hook-form";
 import { toast } from "./toasts/ToastManager";
+import MyModal from "./MyModal";
 
 interface FlashcardStackListProps {
     axiosInstance: AxiosInstance;
@@ -122,55 +123,64 @@ const FlashcardStackList = ({
         <>
             {error != "" && <p className="text-danger">{error}</p>}
             {isLoading && <div className="spinner-border"></div>}
-            <div className="container-fluid text-center row">
-                <h5 className="col">Flashcard Stacks</h5>
+            <div className="container-fluid text-center row p-5">
+                <h1 className="col">Flashcard Stacks</h1>
                 <div className="col">
                     <Collapsible text="Create Flashcard Stack">
                         <FlashcardStackForm onFormSubmit={createStack} />
                     </Collapsible>
                 </div>
             </div>
-            <div className="row row-cols-1 row-cols-md-3 g-4">
+            <div className="row row-cols-1 row-cols-4 g-4">
                 {flashcardStacks.map((flashcardStack) => (
-                    <div key={flashcardStack.id} className="card col h-100">
-                        <div className="card-body d-flex justify-content-between">
-                            <h5 className="card-title">
-                                {flashcardStack.name}
-                            </h5>
-                            <button
-                                className="btn btn-primary"
-                                onClick={launchStack(flashcardStack.id)}
-                            >
-                                Launch Stack
-                            </button>
-                        </div>
+                    <div key={flashcardStack.id} className="col">
+                        <div className="card p-3">
+                            <div className="card-body d-flex justify-content-between">
+                                <h5 className="card-title">
+                                    {flashcardStack.name}
+                                </h5>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={launchStack(flashcardStack.id)}
+                                >
+                                    Launch Stack
+                                </button>
+                            </div>
 
-                        <p className="card-text">
-                            Difficulty : {flashcardStack.difficulty}
-                        </p>
-                        <p className="card-text">
-                            <small className="text-muted">
-                                Last Updated : {flashcardStack.date_modified}
-                            </small>
-                        </p>
+                            <p className="card-text">
+                                Difficulty : {flashcardStack.difficulty}
+                            </p>
+                            <p className="card-text">
+                                <small className="text-muted">
+                                    Last Updated :{" "}
+                                    {flashcardStack.date_modified}
+                                </small>
+                            </p>
 
-                        <div className="text-muted d-flex justify-content-between pb-1">
-                            Author : {flashcardStack.author.username}
-                            <button
-                                className="btn btn-outline-danger"
-                                onClick={() => deleteStack(flashcardStack)}
-                            >
-                                <FaTrashAlt />
-                            </button>
-                        </div>
-                        <div className="card-footer">
-                            <div className="text-center">
-                                <Collapsible text="Edit" color="success">
-                                    <FlashcardList
-                                        axiosInstance={axiosInstance}
-                                        stackID={flashcardStack.id}
-                                    />
-                                </Collapsible>
+                            <div className="text-muted d-flex justify-content-between pb-1">
+                                Author : {flashcardStack.author.username}
+                                <button
+                                    className="btn btn-outline-danger"
+                                    onClick={() => deleteStack(flashcardStack)}
+                                >
+                                    <FaTrashAlt />
+                                </button>
+                            </div>
+                            <div className="card-footer">
+                                <div className="text-center">
+                                    <MyModal
+                                        button_text="edit"
+                                        title="Flashcards"
+                                        size="xl"
+                                    >
+                                        <div className="card card-body">
+                                            <FlashcardList
+                                                axiosInstance={axiosInstance}
+                                                stackID={flashcardStack.id}
+                                            />
+                                        </div>
+                                    </MyModal>
+                                </div>
                             </div>
                         </div>
                     </div>
