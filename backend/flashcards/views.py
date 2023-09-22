@@ -13,7 +13,6 @@ from .permissions import IsAuthorOrReadOnly
 class FlashcardStackListAllCreateAPIView(views.APIView):
     """List all flashcard stacks or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
 
     def get(self, request):
         if request.user.is_anonymous:
