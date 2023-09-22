@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "./toasts/ToastManager";
 import { Flashcard } from "./FlashcardList";
 import MyModal from "./MyModal";
+import { set } from "react-hook-form";
 
 interface StackModalProps {
     axiosInstance: AxiosInstance;
@@ -46,7 +47,7 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                     }
                 )
                 .then((res) => {
-                    getNewFlashcard();
+                    console.log("response ", res);
                 })
                 .catch((err) => {
                     toast.show({
@@ -56,6 +57,7 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                         duration: 5000,
                     });
                 });
+            getNewFlashcard();
         }
     };
 
@@ -74,6 +76,24 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                                 <p>No Question</p>
                             )}
                         </div>
+                        <div className="p-4 pt-0">
+                            {showAnswer ? (
+                                <>
+                                    <h5>Answer</h5>
+                                    <p>{flashcard?.answer_char}</p>
+                                    <p>{flashcard?.answer_img}</p>
+                                </>
+                            ) : (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        setShowAnswer(true);
+                                    }}
+                                >
+                                    <h4>Answer</h4>
+                                </button>
+                            )}
+                        </div>
                         <div className="modal-footer">
                             <div className="">Change Priority</div>
                             <div className="text-center p-1">
@@ -81,6 +101,7 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                                     className="btn btn-primary"
                                     onClick={() => {
                                         postPriority(-1);
+                                        setShowAnswer(false);
                                     }}
                                 >
                                     -1
@@ -88,7 +109,17 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                                 <button
                                     className="btn btn-primary"
                                     onClick={() => {
+                                        postPriority(0);
+                                        setShowAnswer(false);
+                                    }}
+                                >
+                                    +0
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
                                         postPriority(1);
+                                        setShowAnswer(false);
                                     }}
                                 >
                                     +1
@@ -97,14 +128,10 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                                     className="btn btn-primary"
                                     onClick={() => {
                                         postPriority(2);
+                                        setShowAnswer(false);
                                     }}
                                 >
                                     +2
-                                </button>
-                            </div>
-                            <div className="text-end">
-                                <button className="btn btn-primary">
-                                    <h4>Answer</h4>
                                 </button>
                             </div>
                         </div>
