@@ -3,14 +3,17 @@ import axios, { AxiosInstance, CanceledError } from "axios";
 import Button from "./Button";
 import FlashcardStackForm from "./FlashcardStackForm";
 import Collapsible from "./Collapsible";
+import FlashcardList from "./FlashcardList";
 import { FaTrashAlt } from "react-icons/fa";
 import { FieldValues } from "react-hook-form";
+import { toast } from "./toasts/ToastManager";
+import MyModal from "./MyModal";
+import StackModal from "./StackModal";
 
 interface FlashcardStackListProps {
     axiosInstance: AxiosInstance;
-    launchStack: (id: number) => MouseEventHandler<HTMLButtonElement>;
 }
-interface FlashcardStack {
+export interface FlashcardStack {
     id: number;
     author: {
         id: number;
@@ -23,10 +26,7 @@ interface FlashcardStack {
     date_modified: string;
 }
 
-const FlashcardStackList = ({
-    axiosInstance,
-    launchStack,
-}: FlashcardStackListProps) => {
+const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
     const [flashcardStacks, setFlashcardStacks] = useState<FlashcardStack[]>(
         []
     );
@@ -50,7 +50,11 @@ const FlashcardStackList = ({
                     return;
                 }
                 setIsLoading(false);
-                setError(err.message);
+                toast.show({
+                    title: "Error",
+                    content: "Failed to get flashcard stacks: " + err.message,
+                    duration: 5000,
+                });
             })
             // Doesnt work in strict mode?
             .finally(() => {
@@ -99,6 +103,7 @@ const FlashcardStackList = ({
             .then((response) => {
                 if (response.status === 201) {
                     console.log("Flashcard stack created!");
+                    setFlashcardStacks([response.data, ...flashcardStacks]);
                 } else if (response.status === 403 || response.status === 401) {
                     setError(
                         "You are not authorized to create a flashcard stack!"
@@ -115,46 +120,63 @@ const FlashcardStackList = ({
         <>
             {error != "" && <p className="text-danger">{error}</p>}
             {isLoading && <div className="spinner-border"></div>}
-            <div className="container-fluid text-center row">
-                <h5 className="col">Flashcard Stacks</h5>
+            <div className="container-fluid text-center row p-5">
+                <h1 className="col">Flashcard Stacks</h1>
                 <div className="col">
                     <Collapsible text="Create Flashcard Stack">
                         <FlashcardStackForm onFormSubmit={createStack} />
                     </Collapsible>
                 </div>
             </div>
-            <div className="row row-cols-1 row-cols-md-3 g-4">
+            <div className="row row-cols-1 row-cols-4 g-4">
                 {flashcardStacks.map((flashcardStack) => (
-                    <div key={flashcardStack.id} className="card col h-100">
-                        <div className="card-body">
-                            <h5 className="card-title">
-                                {flashcardStack.name}
-                            </h5>
-                        </div>
+                    <div key={flashcardStack.id} className="col">
+                        <div className="card p-3">
+                            <div className="card-body d-flex justify-content-between">
+                                <h5 className="card-title">
+                                    {flashcardStack.name}
+                                </h5>
+                                <StackModal
+                                    axiosInstance={axiosInstance}
+                                    stackID={flashcardStack.id}
+                                />
+                            </div>
 
-                        <p className="card-text">
-                            Difficulty : {flashcardStack.difficulty}
-                        </p>
-                        <p className="card-text">
-                            <small className="text-muted">
-                                Last Updated : {flashcardStack.date_modified}
-                            </small>
-                        </p>
-                        <button
-                            className="btn btn-primary"
-                            onClick={launchStack(flashcardStack.id)}
-                        >
-                            Launch Stack
-                        </button>
+                            <p className="card-text">
+                                Difficulty : {flashcardStack.difficulty}
+                            </p>
+                            <p className="card-text">
+                                <small className="text-muted">
+                                    Last Updated :{" "}
+                                    {flashcardStack.date_modified}
+                                </small>
+                            </p>
 
-                        <div className="card-footer text-muted d-flex justify-content-between">
-                            {flashcardStack.author.username}
-                            <button
-                                className="btn btn-outline-danger"
-                                onClick={() => deleteStack(flashcardStack)}
-                            >
-                                <FaTrashAlt />
-                            </button>
+                            <div className="text-muted d-flex justify-content-between pb-1">
+                                Author : {flashcardStack.author.username}
+                                <button
+                                    className="btn btn-outline-danger"
+                                    onClick={() => deleteStack(flashcardStack)}
+                                >
+                                    <FaTrashAlt />
+                                </button>
+                            </div>
+                            <div className="card-footer">
+                                <div className="text-center">
+                                    <MyModal
+                                        button_text="edit"
+                                        title="Flashcards"
+                                        size="xl"
+                                    >
+                                        <div className="card card-body">
+                                            <FlashcardList
+                                                axiosInstance={axiosInstance}
+                                                stackID={flashcardStack.id}
+                                            />
+                                        </div>
+                                    </MyModal>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}

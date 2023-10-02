@@ -1,7 +1,9 @@
 import random
+
 from rest_framework import views, permissions, response, status, exceptions
 from rest_framework.authentication import TokenAuthentication
 from django.db.models import Q, Count, Case, When, IntegerField
+from django.utils import timezone
 
 from . import serializers
 from .models import FlashcardStack, Flashcard, Priority
@@ -11,7 +13,6 @@ from .permissions import IsAuthorOrReadOnly
 class FlashcardStackListAllCreateAPIView(views.APIView):
     """List all flashcard stacks or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
 
     def get(self, request):
         if request.user.is_anonymous:
@@ -22,7 +23,6 @@ class FlashcardStackListAllCreateAPIView(views.APIView):
         return response.Response(serializer.data)
 
     def post(self, request):
-        print(request.data)
         serializer = serializers.FlashcardStackSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
@@ -54,10 +54,10 @@ class FlashcardStackDetailView(views.APIView):
 
     def put(self, request, pk, format=None):
         flashcard_stack = self.get_object(pk)
-        flashcard_stack
-        serializer = serializers.FlashcardStackSerializer(data=request.data)
+        request.data['date_modified'] = timezone.now()
+        serializer = serializers.FlashcardStackSerializer(flashcard_stack, data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.update(serializer.instance, request.data)
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -69,15 +69,18 @@ class FlashcardStackDetailView(views.APIView):
 
 class FlashcardListAllCreateAPIView(views.APIView):
     """List all flashcards or create a new one."""
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [TokenAuthentication]
 
-
-    def get(self, pk, request):
+    def get(self, request, pk):
         serializer = serializers.FlashcardSerializer(Flashcard.objects.filter(stack__pk=pk), many=True)
         return response.Response(serializer.data)
 
-    def post(self, pk, request):
+    def post(self, request, pk):
+        if not request.data.get('stack_id', None):
+            raise exceptions.ValidationError({'stack_id': 'This field is required.'})
+        if request.user != FlashcardStack.objects.get(pk=request.data['stack_id']).author:
+            raise exceptions.PermissionDenied
         serializer = serializers.FlashcardSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -90,15 +93,17 @@ class FlashcardListAllCreateAPIView(views.APIView):
 
 class FlashcardDetailView(views.APIView):
     """Retrieve, update or delete a flashcard instance."""
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
     authentication_classes = [TokenAuthentication]
-
 
     def get_object(self, pk):
         try:
-            return Flashcard.objects.get(pk=pk)
+            obj = Flashcard.objects.get(pk=pk)
+            if obj.stack.author != self.request.user and not obj.stack.public:
+                raise exceptions.PermissionDenied
+            return obj
         except Flashcard.DoesNotExist:
-            raise status.HTTP_404_NOT_FOUND
+            raise exceptions.NotFound
 
     def get(self, request, pk, format=None):
         flashcard = self.get_object(pk)
@@ -107,33 +112,54 @@ class FlashcardDetailView(views.APIView):
 
     def put(self, request, pk, format=None):
         flashcard = self.get_object(pk)
-        serializer = serializers.FlashcardSerializer(flashcard, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
+        if request.user != flashcard.stack.author:
+            raise exceptions.PermissionDenied
+        request_data = request.data.copy()
+        request_data['date_modified'] = timezone.now()
+        serializer = serializers.FlashcardSerializer(flashcard, data=request_data)
+        if serializer.is_valid():
+            serializer.update(serializer.instance, request_data)
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         flashcard = self.get_object(pk)
+        if request.user != flashcard.stack.author:
+            raise exceptions.PermissionDenied
         flashcard.delete()
         return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class WeightedFlashcard(views.APIView):
     """Retrieve a random flashcard based on the priority"""
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
+    # pk here is the stack pk (different then the post)
     def get(self, request, pk, format=None):
-        flashcard_query = Flashcard.objects.filter(stack__pk=pk)
-        flashcard_query = flashcard_query.annotate(
+        # Create a priority for the user if there isnt one already
+        if not Priority.objects.filter(author=request.user, flashcard__stack__pk=pk).exists():
+            Priority.objects.bulk_create(
+                [Priority(author=request.user, flashcard=flashcard) for flashcard in
+                 Flashcard.objects.filter(stack__pk=pk)]
+            )
+        flashcard_query = Flashcard.objects.filter(
+            stack__pk=pk, priority__author=request.user
+        ).annotate(
             user_priority=Case(
                 When(priority__author=request.user, then='priority__priority'),
                 default=1,
-                output_field=IntegerField()
+                output_field=IntegerField(),
+            ),
+            priority_id=Case(
+                When(priority__author=request.user, then='priority__id'),
+                default=None,
+                output_field=IntegerField(),
             )
         )
         flashcard_list = list(flashcard_query)
+        if not flashcard_list:
+            raise exceptions.NotFound('No flashcards found in this stack.')
 
         # Apply weight by simply duplicating the flashcard in the list
         weighted_flashcard_list = []
@@ -142,12 +168,14 @@ class WeightedFlashcard(views.APIView):
 
         # Get a random flashcard
         flashcard = random.choice(weighted_flashcard_list)
-        serializer = serializers.FlashcardSerializer(flashcard)
+        serializer = serializers.FlashcardSerializerWithPriority(flashcard)
         return response.Response(serializer.data)
 
+    # pk here is the flashcard pk (different from get)
     def post(self, request, pk, format=None):
-        serializer = serializers.PrioritySerializer(data=request.data)
+        priority = Priority.objects.get(author=request.user, flashcard__pk=pk)
+        serializer = serializers.PrioritySerializer(priority, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.update(serializer.instance, request.data)
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

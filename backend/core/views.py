@@ -30,6 +30,19 @@ class RegisterUserAPIView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
 
+    def post(self, request, *args, **kwargs):
+        # Add thing token to serializer to make this work please sop the user can log in straight away
+        resp = super(RegisterUserAPIView, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=resp.data['token'])
+        user = token.user
+        resp2 = response.Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email,
+            'username': user.username,
+        })
+        return resp2
+
 
 class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):

@@ -1,96 +1,153 @@
 import { AxiosInstance } from "axios";
 import { useState, useEffect } from "react";
+import { toast } from "./toasts/ToastManager";
+import { Flashcard } from "./FlashcardList";
+import MyModal from "./MyModal";
+import { set } from "react-hook-form";
 
 interface StackModalProps {
     axiosInstance: AxiosInstance;
     stackID: number;
-    closeStack: () => void;
-}
-interface FlashcardStack {
-    id: number;
-    author: {
-        id: number;
-        username: string;
-    };
-    public: boolean;
-    name: string;
-    difficulty: string;
-    date_created: string;
-    date_modified: string;
-}
-interface Flashcard {
-    id: number;
-    stack: FlashcardStack;
-    question: string;
-    answer_type: string;
-    answer_img: string;
-    answer_char: string;
-    date_created: string;
-    date_modified: string;
 }
 
-const StackModal = ({
-    axiosInstance,
-    stackID,
-    closeStack,
-}: StackModalProps) => {
-    const [stack, setStack] = useState<FlashcardStack>();
+const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
     const [flashcard, setFlashcard] = useState<Flashcard>();
-    const [error, setError] = useState("");
     const [showAnswer, setShowAnswer] = useState(false);
+    const [start, setStart] = useState(false);
 
     useEffect(() => {
-        getNewFlashcard();
-    }, []);
+        start && getNewFlashcard();
+    }, [start]);
 
     const getNewFlashcard = () => {
+        console.log("getNewFlashcard");
         axiosInstance
-            .get(`api/flashcard/flashcard/weightedflashcard/`)
+            .get(`api/flashcards/flashcards/weightedflashcard/${stackID}/`)
             .then((res) => {
                 setFlashcard(res.data);
             })
             .catch((err) => {
-                setError(err.message);
+                toast.show({
+                    title: "Error",
+                    content: "Failed to get flashcard: " + err.message,
+                    duration: 5000,
+                });
             });
     };
 
-    const getNextFlashCard = () => {};
+    const postPriority = (priorityChange: number) => {
+        if (flashcard) {
+            axiosInstance
+                .post(
+                    `api/flashcards/flashcards/weightedflashcard/${flashcard.id}/`,
+                    {
+                        id: flashcard.priority_id,
+                        priority: priorityChange + flashcard.user_priority,
+                        flashcard_id: flashcard.id,
+                    }
+                )
+                .then((res) => {
+                    console.log("response ", res);
+                })
+                .catch((err) => {
+                    toast.show({
+                        title: "Error",
+                        content:
+                            "Failed to update priority! Error: " + err.message,
+                        duration: 5000,
+                    });
+                });
+            getNewFlashcard();
+        }
+    };
 
     return (
-        <div className="modal-dialog modal-xl" role="document">
-            <div className="modal-content rounded-4 shadow">
-                <div className="modal-header p-5 pb-4 border-bottom-0">
-                    <h1 className="fw-bold mb-0 fs-2">Flashcard Stack</h1>
+        <>
+            <MyModal button_text="Launch Stack" title="Stack" size="lg">
+                {start ? (
+                    <>
+                        <div className="p-5 pt-0">
+                            {flashcard?.question ? (
+                                <>
+                                    <h5>Question</h5>
+                                    <p>{flashcard.question}</p>
+                                </>
+                            ) : (
+                                <p>No Question</p>
+                            )}
+                        </div>
+                        <div className="p-4 pt-0">
+                            {showAnswer ? (
+                                <>
+                                    <h5>Answer</h5>
+                                    <p>{flashcard?.answer_char}</p>
+                                    <p>{flashcard?.answer_img}</p>
+                                </>
+                            ) : (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        setShowAnswer(true);
+                                    }}
+                                >
+                                    <h4>Answer</h4>
+                                </button>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <div className="">Change Priority</div>
+                            <div className="text-center p-1">
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        postPriority(-1);
+                                        setShowAnswer(false);
+                                    }}
+                                >
+                                    -1
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        postPriority(0);
+                                        setShowAnswer(false);
+                                    }}
+                                >
+                                    +0
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        postPriority(1);
+                                        setShowAnswer(false);
+                                    }}
+                                >
+                                    +1
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        postPriority(2);
+                                        setShowAnswer(false);
+                                    }}
+                                >
+                                    +2
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
                     <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                        onClick={closeStack}
-                    ></button>
-                </div>
-
-                <div className="modal-body p-5 pt-0">
-                    {flashcard?.question ? (
-                        <h3>{flashcard.question}</h3>
-                    ) : (
-                        <p>No Question</p>
-                    )}
-                </div>
-                <div className="modal-footer">
-                    <div className="text-center">
-                        <button className="btn btn-primary">-1</button>
-                        <button className="btn btn-primary">+1</button>
-                        <button className="btn btn-primary">+2</button>
-                    </div>
-                    <div className="text-end">
-                        <button className="btn btn-primary">
-                            <h4>Answer</h4>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        className="btn btn-primary p-2"
+                        onClick={() => {
+                            setStart(true);
+                        }}
+                    >
+                        Start
+                    </button>
+                )}
+            </MyModal>
+        </>
     );
 };
 

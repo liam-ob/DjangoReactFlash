@@ -1,9 +1,11 @@
 import Button from "./Button";
 import { useForm, FieldValues } from "react-hook-form";
 
-interface RegisterFormProps {}
+interface RegisterFormProps {
+    onFormSubmit: (data: FieldValues) => void;
+}
 
-const RegisterForm = () => {
+const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
     const {
         register,
         handleSubmit,
@@ -16,12 +18,8 @@ const RegisterForm = () => {
         return emailRegexExp.test(email);
     };
 
-    const onFormSubmit = (data: FieldValues) => {
-        console.log(data);
-    };
-
     return (
-        <form onSubmit={onFormSubmit} className="container-sm">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="container-sm">
             <div className="mb-3">
                 <label htmlFor="username" className="form-label">
                     Username
