@@ -1,0 +1,16 @@
+FROM node:16 AS builder
+WORKDIR /frontend
+COPY ./frontend/package.json ./frontend/package-lock.json ./
+
+RUN npm install i
+
+COPY ./frontend .
+
+
+# Deploy through Nginx
+FROM nginx:1.21.3-alpine
+COPY --from=builder /frontend/build /usr/share/nginx/html
+COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]
