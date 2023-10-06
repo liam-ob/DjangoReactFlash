@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*%yg2t(u&9qp!%*qbb@*y07v(8(wptkt9%=7+9=n!zjqp0u107'
-JWT_SECRET = 'blahblahblah'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-*%yg2t(u&9qp!%*qbb@*y07v(8(wptkt9%=7+9=n!zjqp0u107')
+JWT_SECRET = os.environ.get('JWT_SECRET', 'bropleasechangeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get('DJANGO_DEBUG', True)
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', ['*'])
 
 
 # Application definition
@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('POSTGRES_DB', (BASE_DIR / 'db.sqlite3')),
+        'USER': os.environ.get('POSTGRES_USER', None),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', None),
+        'HOST': os.environ.get('POSTGRES_HOST', None),
+        'PORT': os.environ.get('POSTGRES_PORT', None),
     }
 }
 
