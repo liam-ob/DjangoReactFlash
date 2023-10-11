@@ -1,0 +1,15 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+[Service]
+User=backend
+Group=backend
+Directory=/home/backend/backend
+ExecStart=/home/backend/env/bin/gunicorn \
+--access-logfile - \
+--workers 3 \
+--bind unix:/run/gunicorn.sock \
+clubweb.wsgi:application
+[Install]
+WantedBy=multi-user.target

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +26,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-*%yg2t(u&9qp!%*qbb@*y
 JWT_SECRET = os.environ.get('JWT_SECRET', 'bropleasechangeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', True)
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', ['*'])
+DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
+ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
 
 
 # Application definition

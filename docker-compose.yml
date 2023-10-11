@@ -1,10 +1,30 @@
 version: "3.9"
 
 services:
+    # When starting server configure the nginx.conf server name to the ip address of the server
+    frontend:
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.frontend
+        restart: on-failure
+        image: liam-ob/frontend
+        volumes:
+            - frontend:/frontend
+        ports:
+            - "3000:3000"
+        depends_on:
+            - backend
+        env_file:
+            - ./docker/.env
+        # NOTES:
+        # Check for syntax errors: sudo nginx -t
+        # Restart nginx: sudo nginx -t && sudo systemctl restart nginx
+
+
     backend:
         build:
             context: .
-            dockerfile: ./docker/Dockerfile
+            dockerfile: ./docker/Dockerfile.backend
         restart: on-failure
         image: liam-ob/backend
         volumes:
@@ -16,6 +36,16 @@ services:
             - pgadmin
         env_file:
             - ./docker/.env
+        # NOTES:
+        # To bash: docker-compose exec -it backend bash
+        # Check systemctl status: sudo systemctl status gunicorn.socket
+        # Check for .sock file: file /run/gunicorn.sock
+        # Check logs: sudo journalctl -u gunicorn
+        # Check connection: curl --unix-socket /run/gunicorn.sock localhost
+        # Restart django app: sudo systemctl restart gunicorn
+        # Restart daemon: sudo systemctl daemon-reload
+        # Restart socket: sudo systemctl restart gunicorn.socket
+        
 
     postgres:
         image: postgres:13.3
@@ -41,10 +71,6 @@ services:
             - ./docker/.env
 
 volumes:
-    postgres_data:
+    postgres_data:  # Just name the volume to persist between restarts
     backend:
-        driver: local
-        driver_opts:
-            type: none
-            device: ./backend/
-            o: bind
+    frontend:
