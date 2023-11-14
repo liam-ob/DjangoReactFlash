@@ -18,7 +18,7 @@ services:
             - ./docker/.env
         # NOTES:
         # Check for syntax errors: sudo nginx -t
-        # Restart nginx: sudo nginx -t && sudo systemctl restart nginx
+        # Restart nginx: sudo nginx -t && sudo systemctl restart nginx bro
 
 
     backend:
