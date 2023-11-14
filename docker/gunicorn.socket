@@ -1,4 +1,4 @@
-# FILEPATH: /c:/Users/liam.obrien/PycharmProjects/DjangoReactFlash/docker/gunicorn.socket
+
 
 [Unit]
 Description=gunicorn socket

@@ -83,32 +83,40 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
     };
 
     return (
-        <nav className="navbar bg-body-tertiary">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="#">
-                    DRFlashcards
-                </a>
-                {user.username === "" ? (
-                    <>
+        <header className="p-3 mb-3 border-bottom">
+            <nav className="container">
+                <div className="d-flex flex-wrap aling-items-center justify-content-center">
+                    <ul className="nav col-12 col-lg-auto me-lg-auto link-body-emphasis text-decoration-none">
+                        <li>
+                            <a className="nav-link px-2 link-primary">
+                                <strong>DRF</strong>lashcards
+                            </a>
+                        </li>
+                    </ul>
+                    {user.username === "" ? (
+                        <>
+                            <div className="justify-content row w-50">
+                                <div className="col-6">
+                                    <Collapsible text="Login">
+                                        <LoginForm onFormSubmit={loginUser} />
+                                    </Collapsible>
+                                </div>
+                                <div className="col-6">
+                                    <Collapsible text="Register">
+                                        <RegisterForm onFormSubmit={registerUser} />
+                                    </Collapsible>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
                         <div className="d-flex">
-                            <Collapsible text="Login">
-                                <LoginForm onFormSubmit={loginUser} />
-                            </Collapsible>
+                            <div className="me-2">{user.username}</div>
+                            <Button text="Logout" onClick={logoutUser} />
                         </div>
-                        <div className="d-flex">
-                            <Collapsible text="Register">
-                                <RegisterForm onFormSubmit={registerUser} />
-                            </Collapsible>
-                        </div>
-                    </>
-                ) : (
-                    <div className="d-flex">
-                        <div className="me-2">{user.username}</div>
-                        <Button text="Logout" onClick={logoutUser} />
-                    </div>
-                )}
-            </div>
-        </nav>
+                    )}
+                </div>
+            </nav>
+        </header>
     );
 };
 

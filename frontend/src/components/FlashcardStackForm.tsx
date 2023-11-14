@@ -12,24 +12,15 @@ const FlashcardStackForm = ({ onFormSubmit }: FlashcardStackFormProps) => {
 
     return (
         <>
-            <form
-                onSubmit={handleSubmit(onFormSubmit)}
-                className="container-fluid text-start"
-            >
-                <div className="mb-3">
-                    <input
-                        {...register("public")}
-                        className="form-check-input"
-                        type="checkbox"
-                        value=""
-                        id="public"
-                    ></input>
-                    <label className="form-check-label px-3" htmlFor="public">
-                        Make this stack public
-                    </label>
-                </div>
-                <div className="row">
-                    <div className="col-md-9">
+            <form onSubmit={handleSubmit(onFormSubmit)} className="container">
+                <div className="border rounded border-priamry border-2 m-auto">
+                    <div className="m-auto p-2">
+                        <input {...register("public")} className="form-check-input" type="checkbox" value="" id="public"></input>
+                        <label className="form-check-label px-3" htmlFor="public">
+                            Make this stack public
+                        </label>
+                    </div>
+                    <div className="m-auto p-2">
                         <label htmlFor="name" className="form-label">
                             Flashcard Stack Name
                         </label>
@@ -42,11 +33,9 @@ const FlashcardStackForm = ({ onFormSubmit }: FlashcardStackFormProps) => {
                             className="form-control"
                             placeholder="Flashcard Stack Name"
                         />
-                        {formState.errors.name?.type === "required" && (
-                            <p>This field is required</p>
-                        )}
+                        {formState.errors.name?.type === "required" && <p>This field is required</p>}
                     </div>
-                    <div className="col-md-3">
+                    <div className="p-2">
                         <label htmlFor="difficulty" className="form-label">
                             Stack Difficulty
                         </label>
@@ -62,9 +51,9 @@ const FlashcardStackForm = ({ onFormSubmit }: FlashcardStackFormProps) => {
                             <option value="hard">Hard</option>
                         </select>
                     </div>
-                </div>
-                <div className="p-3">
-                    <Button text="Create Flashcard Stack" type="submit" />
+                    <div className="p-3">
+                        <Button text="Create Flashcard Stack" type="submit" />
+                    </div>
                 </div>
             </form>
         </>
