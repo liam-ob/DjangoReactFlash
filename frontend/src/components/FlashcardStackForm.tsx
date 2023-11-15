@@ -13,7 +13,7 @@ const FlashcardStackForm = ({ onFormSubmit }: FlashcardStackFormProps) => {
     return (
         <>
             <form onSubmit={handleSubmit(onFormSubmit)} className="container">
-                <div className="border rounded border-priamry border-2 m-auto">
+                <div className="border rounded border-2 m-auto">
                     <div className="m-auto p-2">
                         <input {...register("public")} className="form-check-input" type="checkbox" value="" id="public"></input>
                         <label className="form-check-label px-3" htmlFor="public">

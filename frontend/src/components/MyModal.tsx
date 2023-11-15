@@ -12,12 +12,7 @@ interface MyModalProps {
     size?: "sm" | "lg" | "xl" | undefined;
 }
 
-const MyModal = ({
-    title,
-    button_text,
-    children,
-    size = "sm",
-}: MyModalProps) => {
+const MyModal = ({ title, button_text, children, size = "sm" }: MyModalProps) => {
     const [show, setShow] = useState(false);
 
     return (

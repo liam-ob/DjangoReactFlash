@@ -110,12 +110,12 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
             {error != "" && <p className="text-danger">{error}</p>}
             {isLoading && <div className="spinner-border"></div>}
             <div className="container">
-                <div className="d-flex jsutify-content-center align-items-center py-3">
-                    <form className="w-50 m-auto mt-0" role="search">
-                        <input type="search" className="form-control" placeholder="Search..." aria-label="Search" />
+                <div className="row p-1">
+                    <form className="col-sm-8 p-1" role="search">
+                        <input type="search" className="form-control" placeholder="Search... (i dont work yet)" aria-label="Search" />
                     </form>
 
-                    <div className="w-50">
+                    <div className="col-sm-4 p-1">
                         <Collapsible text="Create Flashcard Stack">
                             <FlashcardStackForm onFormSubmit={createStack} />
                         </Collapsible>
@@ -123,38 +123,38 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
                 </div>
             </div>
 
-            <div className="row row-cols-1 row-cols-4 g-4">
-                {flashcardStacks.map((flashcardStack) => (
-                    <div key={flashcardStack.id} className="col">
-                        <div className="card p-3">
-                            <div className="card-body d-flex justify-content-between">
-                                <h5 className="card-title">{flashcardStack.name}</h5>
-                                <StackModal axiosInstance={axiosInstance} stackID={flashcardStack.id} />
-                            </div>
+            <div className="container">
+                <div className="row row-sm-cols-1 g-4">
+                    {flashcardStacks.map((flashcardStack) => (
+                        <div key={flashcardStack.id} className="col-sm-3">
+                            <div className="card p-3">
+                                <div className="card-body d-flex justify-content-between">
+                                    <h5 className="card-title">{flashcardStack.name}</h5>
+                                    <StackModal axiosInstance={axiosInstance} stackID={flashcardStack.id} />
+                                </div>
 
-                            <p className="card-text">Difficulty : {flashcardStack.difficulty}</p>
-                            <p className="card-text">
-                                <small className="text-muted">Last Updated : {flashcardStack.date_modified}</small>
-                            </p>
+                                <p className="card-text">Difficulty : {flashcardStack.difficulty}</p>
+                                <p className="card-text">
+                                    <small className="text-muted">Last Updated : {flashcardStack.date_modified}</small>
+                                </p>
 
-                            <div className="text-muted d-flex justify-content-between pb-1">
-                                Author : {flashcardStack.author.username}
-                                <button className="btn btn-outline-danger" onClick={() => deleteStack(flashcardStack)}>
-                                    <FaTrashAlt />
-                                </button>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <MyModal button_text="edit" title="Flashcards" size="xl">
-                                        <div className="card card-body">
+                                <div className="text-muted d-flex justify-content-between pb-1">
+                                    Author : {flashcardStack.author.username}
+                                    <button className="btn btn-outline-danger" onClick={() => deleteStack(flashcardStack)}>
+                                        <FaTrashAlt />
+                                    </button>
+                                </div>
+                                <div className="card-footer">
+                                    <div className="text-center">
+                                        <MyModal button_text="edit" title="Flashcards" size="xl">
                                             <FlashcardList axiosInstance={axiosInstance} stackID={flashcardStack.id} />
-                                        </div>
-                                    </MyModal>
+                                        </MyModal>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </>
     );

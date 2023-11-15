@@ -3,9 +3,10 @@ import { useForm, FieldValues } from "react-hook-form";
 
 interface RegisterFormProps {
     onFormSubmit: (data: FieldValues) => void;
+    handleLogin: () => void;
 }
 
-const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
+const RegisterForm = ({ onFormSubmit, handleLogin }: RegisterFormProps) => {
     const {
         register,
         handleSubmit,
@@ -34,12 +35,8 @@ const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
                     className="form-control"
                     placeholder="Username"
                 />
-                {errors.username?.type === "required" && (
-                    <p>This field is required</p>
-                )}
-                {errors.username?.type === "minLength" && (
-                    <p>Username must be at least 4 characters long</p>
-                )}
+                {errors.username?.type === "required" && <p>This field is required</p>}
+                {errors.username?.type === "minLength" && <p>Username must be at least 4 characters long</p>}
             </div>
             <div className="mb-3">
                 <label htmlFor="email" className="form-label">
@@ -55,12 +52,8 @@ const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
                     className="form-control"
                     placeholder="Email"
                 />
-                {errors.email?.type === "required" && (
-                    <p>This field is required</p>
-                )}
-                {errors.email?.type === "validate" && (
-                    <p>Please enter a valid email</p>
-                )}
+                {errors.email?.type === "required" && <p>This field is required</p>}
+                {errors.email?.type === "validate" && <p>Please enter a valid email</p>}
             </div>
             <div className="mb-3">
                 <label htmlFor="password" className="form-label">
@@ -73,9 +66,7 @@ const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
                     className="form-control"
                     placeholder="password"
                 />
-                {errors.password?.type === "minLength" && (
-                    <p>Username must be at least 8 characters long</p>
-                )}
+                {errors.password?.type === "minLength" && <p>Username must be at least 8 characters long</p>}
             </div>
             <div className="mb-3">
                 <label htmlFor="password2" className="form-label">
@@ -91,14 +82,17 @@ const RegisterForm = ({ onFormSubmit }: RegisterFormProps) => {
                     className="form-control"
                     placeholder="confirm password"
                 />
-                {errors.password2?.type === "required" && (
-                    <p>This field is required</p>
-                )}
-                {errors.password2?.type === "validate" && (
-                    <p>Passwords must match</p>
-                )}
+                {errors.password2?.type === "required" && <p>This field is required</p>}
+                {errors.password2?.type === "validate" && <p>Passwords must match</p>}
             </div>
-            <Button text="Register" type="submit" colour="success" />
+            <div className="row text-center">
+                <div className="col">
+                    <Button text="Register" type="submit" colour="success" />
+                </div>
+                <div className="col">
+                    <Button text="Login Instead" colour="primary" onClick={handleLogin} />
+                </div>
+            </div>
         </form>
     );
 };

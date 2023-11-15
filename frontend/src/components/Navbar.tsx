@@ -16,6 +16,9 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
         username: "",
     });
 
+    const [login, setLogin] = useState(true);
+    const [register, setRegister] = useState(false);
+
     // Set the logged in user. probably make this a jwt token
     useEffect(() => {
         const controller = new AbortController();
@@ -82,36 +85,49 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
             });
     };
 
+    const handleLoginRegisterSwitch = () => {
+        setLogin(!login);
+        setRegister(!register);
+    };
+
     return (
-        <header className="p-3 mb-3 border-bottom">
-            <nav className="container">
-                <div className="d-flex flex-wrap aling-items-center justify-content-center">
-                    <ul className="nav col-12 col-lg-auto me-lg-auto link-body-emphasis text-decoration-none">
-                        <li>
-                            <a className="nav-link px-2 link-primary">
-                                <strong>DRF</strong>lashcards
-                            </a>
-                        </li>
-                    </ul>
+        <header className="border-bottom">
+            <nav className="container-md">
+                <div className="row justify-content-md-center">
+                    <a className="col-sm-8 d-none d-sm-block nav-link px-2 link-primary">
+                        <strong>DRF</strong>lashcards
+                    </a>
                     {user.username === "" ? (
                         <>
-                            <div className="justify-content row w-50">
-                                <div className="col-6">
-                                    <Collapsible text="Login">
-                                        <LoginForm onFormSubmit={loginUser} />
-                                    </Collapsible>
-                                </div>
-                                <div className="col-6">
-                                    <Collapsible text="Register">
-                                        <RegisterForm onFormSubmit={registerUser} />
+                            <div className="col-sm-4 col- row">
+                                <div className="p-1 col">
+                                    <Collapsible text={register ? "Login" : "Register"}>
+                                        {register && (
+                                            <>
+                                                <LoginForm onFormSubmit={loginUser} handleRegister={handleLoginRegisterSwitch} />
+                                            </>
+                                        )}
+                                        {login && (
+                                            <>
+                                                <RegisterForm onFormSubmit={registerUser} handleLogin={handleLoginRegisterSwitch} />
+                                            </>
+                                        )}
                                     </Collapsible>
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="d-flex">
-                            <div className="me-2">{user.username}</div>
-                            <Button text="Logout" onClick={logoutUser} />
+                        <div className="col-sm-4">
+                            <div className="container py-2">
+                                <div className="row text-center">
+                                    <div className="col-6">
+                                        <span className="badge rounded-pill text-bg-dark">{user.username}</span>
+                                    </div>
+                                    <div className="col-6">
+                                        <Button text="Logout" onClick={logoutUser} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

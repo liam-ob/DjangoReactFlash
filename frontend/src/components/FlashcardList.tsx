@@ -45,8 +45,7 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
                 if (res.status === 401 || res.status === 403) {
                     toast.show({
                         title: "Error",
-                        content:
-                            "You Need to be the Author (or do you need to be logged in idk) of the Stack!",
+                        content: "You Need to be the Author (or do you need to be logged in idk) of the Stack!",
                         duration: 10000,
                     });
                 }
@@ -116,60 +115,54 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
 
     const deleteFlashcard = (flashcard: Flashcard) => {
         const originalFlashcards = [...flashcards];
-        setFlashcards(
-            flashcards.filter((flashcard) => flashcard.id != flashcard.id)
-        );
-        axiosInstance
-            .delete(`api/flashcards/flashcards/detail/${flashcard.id}/`)
-            .catch((err) => {
-                toast.show({
-                    title: "Error",
-                    content: "Failed to delete flashcard: " + err.message,
-                    duration: 5000,
-                });
-                setFlashcards(originalFlashcards);
+        setFlashcards(flashcards.filter((flashcard) => flashcard.id != flashcard.id));
+        axiosInstance.delete(`api/flashcards/flashcards/detail/${flashcard.id}/`).catch((err) => {
+            toast.show({
+                title: "Error",
+                content: "Failed to delete flashcard: " + err.message,
+                duration: 5000,
             });
+            setFlashcards(originalFlashcards);
+        });
     };
 
     return (
         <>
-            <div className="text-center ">
-                <MyModal
-                    button_text="Create Flashcard"
-                    title="Create Flashcard"
-                    size="lg"
-                >
+            <div className="text-center">
+                <MyModal button_text="Create Flashcard" title="Create Flashcard" size="lg">
                     <FlashcardForm onFormSubmit={createFlashcard} />
                 </MyModal>
             </div>
             {isLoading && <div className="spinner-border"></div>}
-            <div className="row row-cols-1 row-cols-4 g-4">
-                {flashcards.map((flashcard) => (
-                    <div className="card" key={flashcard.id}>
-                        <div className="card-body">
-                            <h5 className="card-title">{flashcard.question}</h5>
-                            <p className="card-text">{flashcard.answer_char}</p>
-                            {flashcard?.answer_img && (
-                                <p className="card-text">
-                                    {flashcard.answer_img}
-                                </p>
-                            )}
-                            <p className="card-text">
-                                Priority : {flashcard.priority_id}
-                            </p>
+            <div className="container">
+                <div className="row">
+                    {flashcards.map((flashcard) => (
+                        <div className="col-sm-4 p-1" key={flashcard.id}>
+                            <div className="card">
+                                <div className="card-body">
+                                    <h5 className="card-title">{flashcard.question}</h5>
+                                    <p className="card-text">{flashcard.answer_char}</p>
+                                    {flashcard?.answer_img && <p className="card-text">{flashcard.answer_img}</p>}
+                                    <p className="card-text">Priority : {flashcard.priority_id}</p>
+                                </div>
+                                <div className="card-footer text-center">
+                                    <p>{flashcard.date_modified}</p>
+                                    <div className="row">
+                                        <div className="col-md-auto">
+                                            <button className="btn btn-outline-danger" onClick={() => deleteFlashcard(flashcard)}>
+                                                <FaTrashAlt />
+                                            </button>
+                                        </div>
+                                        <div className="col"></div>
+                                        <div className="col-md-auto">
+                                            <button className="btn btn-primary">Edit (not working)</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="card-footer">
-                            <p>{flashcard.date_modified}</p>
-                            <button
-                                className="btn btn-outline-danger"
-                                onClick={() => deleteFlashcard(flashcard)}
-                            >
-                                <FaTrashAlt />
-                            </button>
-                            <button className="btn btn-primary">Edit</button>
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </>
     );

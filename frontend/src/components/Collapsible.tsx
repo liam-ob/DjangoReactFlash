@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { BsCaretDownSquareFill, BsFillCaretUpSquareFill } from "react-icons/bs";
 interface CollapsibleProps {
+    formWidth?: string;
     open?: boolean;
     text: string;
     color?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark";
     children: React.ReactNode;
 }
 
-const Collapsible: React.FC<CollapsibleProps> = ({ open = false, children, color = "primary", text }) => {
+const Collapsible: React.FC<CollapsibleProps> = ({ open = false, children, color = "primary", text, formWidth }) => {
     const [isOpen, setIsOpen] = useState(open);
 
     const handleFilterOpening = () => {
@@ -33,19 +34,23 @@ const Collapsible: React.FC<CollapsibleProps> = ({ open = false, children, color
     }, [isOpen]);
 
     return (
-        <div className="container">
-            <div className="d-flex w-100 m-auto align-items-center">
-                <button type="button" className={"btn m-auto btn-" + color} onClick={handleFilterOpening}>
-                    <div className="d-flex align-items-center">
-                        <span className="">{text}</span>
-                        <span className="ps-2 pb-1">{!isOpen ? <BsCaretDownSquareFill /> : <BsFillCaretUpSquareFill />}</span>
+        <>
+            <div className="container">
+                <div className="d-flex text-center">
+                    <div className="col">
+                        <button type="button" className={"btn btn-" + color} onClick={handleFilterOpening}>
+                            <div className="d-flex align-items-center">
+                                <span className="">{text}</span>
+                                <span className="ps-2 pb-1">{!isOpen ? <BsCaretDownSquareFill /> : <BsFillCaretUpSquareFill />}</span>
+                            </div>
+                        </button>
                     </div>
-                </button>
+                </div>
+                <div className="my-collapsible" style={{ height }}>
+                    <div ref={heightRef}>{isOpen && <div className="">{children}</div>}</div>
+                </div>
             </div>
-            <div className="my-collapsible" style={{ height }}>
-                <div ref={heightRef}>{isOpen && <div className="">{children}</div>}</div>
-            </div>
-        </div>
+        </>
     );
 };
 
