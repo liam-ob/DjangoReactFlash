@@ -8,17 +8,18 @@ import ModalTitle from "react-bootstrap/ModalTitle";
 interface MyModalProps {
     title: string;
     button_text: string;
+    button_size?: "sm" | "md" | "lg";
     children?: React.ReactNode;
     size?: "sm" | "lg" | "xl" | undefined;
 }
 
-const MyModal = ({ title, button_text, children, size = "sm" }: MyModalProps) => {
+const MyModal = ({ title, button_text, button_size = "sm", children, size = "sm" }: MyModalProps) => {
     const [show, setShow] = useState(false);
 
     return (
         <>
             <button
-                className="btn btn-primary p-2"
+                className={"btn  h-100 btn-primary btn-" + button_size}
                 onClick={() => {
                     setShow(!show);
                 }}

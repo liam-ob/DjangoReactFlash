@@ -38,22 +38,18 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
     const postPriority = (priorityChange: number) => {
         if (flashcard) {
             axiosInstance
-                .post(
-                    `api/flashcards/flashcards/weightedflashcard/${flashcard.id}/`,
-                    {
-                        id: flashcard.priority_id,
-                        priority: priorityChange + flashcard.user_priority,
-                        flashcard_id: flashcard.id,
-                    }
-                )
+                .post(`api/flashcards/flashcards/weightedflashcard/${flashcard.id}/`, {
+                    id: flashcard.priority_id,
+                    priority: priorityChange + flashcard.user_priority,
+                    flashcard_id: flashcard.id,
+                })
                 .then((res) => {
                     console.log("response ", res);
                 })
                 .catch((err) => {
                     toast.show({
                         title: "Error",
-                        content:
-                            "Failed to update priority! Error: " + err.message,
+                        content: "Failed to update priority! Error: " + err.message,
                         duration: 5000,
                     });
                 });
@@ -63,7 +59,7 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
 
     return (
         <>
-            <MyModal button_text="Launch Stack" title="Stack" size="lg">
+            <MyModal button_text="Launch" title="Stack" size="lg">
                 {start ? (
                     <>
                         <div className="p-5 pt-0">
