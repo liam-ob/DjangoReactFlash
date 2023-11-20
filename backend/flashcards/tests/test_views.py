@@ -14,7 +14,7 @@ class TestFlashcardStack(CommonData):
     # CREATE
     def test_unauthorized_cant_make_flashcard_stack(self):
         response = APIClient().post(path='/api/flashcards/flashcardstacks/listcreate/', data=self.create_public_flashcard_stack_data, format='json')
-        assert response.status_code == 401
+        assert response.status_code == 403
 
     def test_authorized_client_can_make_flashcard_stack(self, authenticated_client):
         response = authenticated_client.post(path='/api/flashcards/flashcardstacks/listcreate/', data=self.create_public_flashcard_stack_data, format='json')
