@@ -3,28 +3,27 @@
 export PROJECT="/website"
 
 # Update the system
-apt-get -q update
+sudo apt-get update
 
 # Install Python 3.11
-apt-get -q install python3.11 -y
+sudo apt-get install python3.11 -y
 
 # Install npm
-apt-get -q install npm -y
+sudo apt-get install npm -y
 
 # Install curl
-apt-get -q install curl -y
+sudo apt-get install curl -y
 
 #install poetry
-curl -sSL https://install.python-poetry.org | python3.11 -
+curl -sSL https://install.python-poetry.org | sudo python3.11 -
 export PATH="/root/.local/bin:$PATH"
 poetry config virtualenvs.create false
 
 # Install nginx
-apt-get install nginx -y
+sudo apt-get install nginx -y
 
 # Install Node.js
-curl -sL https://deb.nodesource.com/setup_14.x | -E bash -
-apt-get -q install nodejs -y
+sudo apt-get install nodejs -y
 
 source ~/.bashrc
 
@@ -49,13 +48,17 @@ python3.11 manage.py collectstatic --noinput
 export GUNICORN_PATH=$(which gunicorn)
 source ~/.bashrc
 
+# update node
+sudo npm install -g n
+sudo n stable
+
 # Install and build npm dependencies
 cd $PROJECT/frontend
 npm ci --silent
 npm run build
 
 # link nginx config file
-ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/website
+sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/website
 
 # Start gunicorn
 cp $PROJECT/deployment/gunicorn.service /etc/systemd/system/gunicorn.service
