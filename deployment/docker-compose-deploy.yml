@@ -1,0 +1,22 @@
+version: '3'
+services:
+  deployment:
+    image: test-drf-deployment
+    container_name: deployment
+    # command: /bin/bash -c "while true; do sleep 1; done"
+    # entrypoint: /website/deployment/deploy.sh
+    build:
+      context: ../
+      dockerfile: ./deployment/Dockerfile    
+    # volumes:
+    #   - deployment:/website
+    ports:
+      - 8080:8080
+
+volumes:
+  deployment:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../
