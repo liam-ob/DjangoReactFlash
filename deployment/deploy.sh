@@ -63,6 +63,7 @@ echo "Installing and building npm dependencies..."
 cd $PROJECT/frontend
 sudo npm ci --silent
 sudo npm run build
+sudo chmod -R 755 $PROJECT/frontend/build
 
 # Start gunicorn
 echo "Starting gunicorn..."
@@ -73,6 +74,7 @@ sudo systemctl status gunicorn
 sudo systemctl daemon-reload
 
 # start nginx
+# TODO: Should nginx be run in its own user?
 echo "Starting nginx..."
 sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
 cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
