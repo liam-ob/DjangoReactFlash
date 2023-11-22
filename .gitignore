@@ -11,6 +11,7 @@ __pycache__
 .env.*
 *.env.*
 *.coverage
+setenv.sh
 
 *.sqlite3
 **/migrations/**

@@ -1,6 +1,5 @@
 
 #!/bin/bash
-export PROJECT="/home/ubuntu/DjangoReactFlash"
 
 # Update the system
 echo "Updating apt-get"
@@ -36,7 +35,7 @@ source ~/.bashrc
 # Install Python dependencies without a virtual environment
 echo "Installing Python dependencies..."
 until cd $PROJECT; do
-  echo "Waiting for volume to mount..."
+  echo "Waiting for project to be available..."
   sleep 2
 done
 cd $PROJECT
@@ -63,24 +62,21 @@ echo "Installing and building npm dependencies..."
 cd $PROJECT/frontend
 sudo npm ci --silent
 sudo npm run build
-sudo chmod -R 755 $PROJECT/frontend/build
+sudo chmod -R 755 $PROJECT/frontend/
 
 # Start gunicorn
 echo "Starting gunicorn..."
 sudo cp $PROJECT/deployment/gunicorn.service /etc/systemd/system/gunicorn.service
 sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
-sudo systemctl status gunicorn
 sudo systemctl daemon-reload
 
 # start nginx
-# TODO: Should nginx be run in its own user?
 echo "Starting nginx..."
 sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
 sudo cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
 sudo systemctl start nginx
 sudo systemctl enable nginx
-sudo systemctl status nginx
 sudo systemctl daemon-reload
 
 # restart both the services
