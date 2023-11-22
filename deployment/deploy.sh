@@ -67,7 +67,7 @@ sudo chmod -R 755 $PROJECT/frontend/build
 
 # Start gunicorn
 echo "Starting gunicorn..."
-cp $PROJECT/deployment/gunicorn.service /etc/systemd/system/gunicorn.service
+sudo cp $PROJECT/deployment/gunicorn.service /etc/systemd/system/gunicorn.service
 sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
 sudo systemctl status gunicorn
@@ -77,7 +77,7 @@ sudo systemctl daemon-reload
 # TODO: Should nginx be run in its own user?
 echo "Starting nginx..."
 sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
-cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
+sudo cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
 sudo systemctl start nginx
 sudo systemctl enable nginx
 sudo systemctl status nginx

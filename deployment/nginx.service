@@ -7,7 +7,7 @@ User=ubuntu
 Group=ubuntu
 ExecStart=/usr/sbin/nginx
 ExecReload=/usr/sbin/nginx -s reload
-ExecStop=ExecStop=/bin/systemctl stop nginx
+ExecStop=/bin/systemctl stop nginx
 PIDFile=/run/nginx.pid
 Restart=on-failure
 RestartSec=3
