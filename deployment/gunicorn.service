@@ -5,8 +5,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=$PROJECT/backend
-ExecStart=$GUNICORN_EXEC --workers 3 --bind $GUNICORN_IP:8080 backend.wsgi:application
+WorkingDirectory=/var/www/DjangoReactFlash/backend
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind 127.0.0.1:8080 backend.wsgi:application
 
 [Install]
 WantedBy=multi-user.target

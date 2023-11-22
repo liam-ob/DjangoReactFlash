@@ -20,7 +20,7 @@ sudo apt-get -qq install curl -y
 #install poetry
 echo "Installing poetry..."
 curl -s -sSL https://install.python-poetry.org | sudo python3.11 -
-sudo /usr/local/bin/poetry config virtualenvs.create false
+sudo /root/.local/bin/poetry config virtualenvs.create false
 
 # Install nginx
 echo "Installing nginx..."
@@ -39,7 +39,7 @@ until cd $PROJECT; do
   sleep 2
 done
 cd $PROJECT
-sudo /usr/local/bin/poetry install
+sudo /root/.local/bin/poetry install
 
 # Run the Django migrations
 echo "Running Django migrations..."
