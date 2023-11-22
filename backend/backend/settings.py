@@ -30,7 +30,7 @@ DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
 if type(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')) == str:
     ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
 else:
-    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')
+    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', ["*"])
 
 
 # Application definition

@@ -3,8 +3,6 @@ Description=Nginx HTTP server
 After=network.target
 
 [Service]
-User=www-data
-Group=www-data
 ExecStart=/usr/sbin/nginx
 ExecReload=/usr/sbin/nginx -s reload
 ExecStop=/bin/systemctl stop nginx
