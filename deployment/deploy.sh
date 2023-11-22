@@ -1,6 +1,6 @@
 
 #!/bin/bash
-export PROJECT="/website"
+export PROJECT="/home/ubuntu/DjangoReactFlash"
 
 # Update the system
 sudo apt-get update
@@ -16,8 +16,7 @@ sudo apt-get install curl -y
 
 #install poetry
 curl -sSL https://install.python-poetry.org | sudo python3.11 -
-export PATH="/root/.local/bin:$PATH"
-poetry config virtualenvs.create false
+sudo /usr/local/bin/poetry config virtualenvs.create false
 
 # Install nginx
 sudo apt-get install nginx -y
@@ -34,7 +33,7 @@ until cd $PROJECT; do
   sleep 2
 done
 cd $PROJECT
-poetry install
+sudo /usr/local/bin/poetry install
 
 # Run the Django migrations
 cd $PROJECT/backend
@@ -54,19 +53,24 @@ sudo n stable
 
 # Install and build npm dependencies
 cd $PROJECT/frontend
-npm ci --silent
-npm run build
-
-# link nginx config file
-sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/website
+sudo npm ci --silent
+sudo npm run build
 
 # Start gunicorn
 cp $PROJECT/deployment/gunicorn.service /etc/systemd/system/gunicorn.service
-systemctl start gunicorn
-systemctl enable gunicorn
-systemctl status gunicorn
-systemctl daemon-reload
-systemctl restart gunicorn
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl status gunicorn
+sudo systemctl daemon-reload
 
 # start nginx
-nginx -t
+sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
+cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+sudo systemctl daemon-reload
+
+# restart both the services
+sudo systemctl restart nginx
+sudo systemctl restart gunicorn

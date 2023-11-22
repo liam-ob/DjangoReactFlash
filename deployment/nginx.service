@@ -1,0 +1,15 @@
+[Unit]
+Description=Nginx HTTP server
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/nginx
+ExecReload=/usr/sbin/nginx -s reload
+ExecStop=/usr/sbin/nginx -s stop
+PIDFile=/run/nginx.pid
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
