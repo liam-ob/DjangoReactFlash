@@ -27,7 +27,10 @@ JWT_SECRET = os.environ.get('JWT_SECRET', 'bropleasechangeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
-ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
+if type(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')) == str:
+    ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
+else:
+    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')
 
 
 # Application definition
