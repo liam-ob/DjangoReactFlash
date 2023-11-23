@@ -24,9 +24,7 @@ const Toast: React.FC<ToastProps> = (props) => {
     return (
         <div>
             <div className={"toast-header"}>
-                <div>
-                    {title} {id}
-                </div>
+                <div>{title}</div>
                 <button onClick={destroy}>X</button>
             </div>
             <div className={"toast-body"}>{content}</div>

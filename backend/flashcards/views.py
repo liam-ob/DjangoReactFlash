@@ -1,8 +1,8 @@
 import random
 
 from rest_framework import views, permissions, response, status, exceptions
-from rest_framework.authentication import TokenAuthentication
-from django.db.models import Q, Count, Case, When, IntegerField
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from django.db.models import Q, Count, Case, When, IntegerField, Prefetch
 from django.utils import timezone
 
 from . import serializers
@@ -13,6 +13,7 @@ from .permissions import IsAuthorOrReadOnly
 class FlashcardStackListAllCreateAPIView(views.APIView):
     """List all flashcard stacks or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request):
         if request.user.is_anonymous:
@@ -36,7 +37,7 @@ class FlashcardStackListAllCreateAPIView(views.APIView):
 class FlashcardStackDetailView(views.APIView):
     """Retrieve, update or delete a flashcard stack instance."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_object(self, pk):
         try:
@@ -70,10 +71,17 @@ class FlashcardStackDetailView(views.APIView):
 class FlashcardListAllCreateAPIView(views.APIView):
     """List all flashcards or create a new one."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get(self, request, pk):
-        serializer = serializers.FlashcardSerializer(Flashcard.objects.filter(stack__pk=pk), many=True)
+        stack = FlashcardStack.objects.get(pk=pk)
+        if stack.author != request.user and not stack.public:
+            raise exceptions.PermissionDenied
+        
+        flashcards_with_priority = Flashcard.objects.filter(stack=stack).annotate(
+            user_priority=Priority.objects.filter(author=request.user, flashcard__stack=stack).values('priority')
+        )
+        serializer = serializers.FlashcardSerializerWithPriority(flashcards_with_priority, many=True)
         return response.Response(serializer.data)
 
     def post(self, request, pk):
@@ -94,7 +102,7 @@ class FlashcardListAllCreateAPIView(views.APIView):
 class FlashcardDetailView(views.APIView):
     """Retrieve, update or delete a flashcard instance."""
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_object(self, pk):
         try:
@@ -133,7 +141,7 @@ class FlashcardDetailView(views.APIView):
 class WeightedFlashcard(views.APIView):
     """Retrieve a random flashcard based on the priority"""
     permission_classes = [permissions.IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     # pk here is the stack pk (different then the post)
     def get(self, request, pk, format=None):

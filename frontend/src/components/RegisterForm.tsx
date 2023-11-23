@@ -1,5 +1,5 @@
 import Button from "./Button";
-import { useForm, FieldValues } from "react-hook-form";
+import { useForm, FieldValues, UseFormGetValues } from "react-hook-form";
 
 interface RegisterFormProps {
     onFormSubmit: (data: FieldValues) => void;
@@ -10,13 +10,15 @@ const RegisterForm = ({ onFormSubmit, handleLogin }: RegisterFormProps) => {
     const {
         register,
         handleSubmit,
+        getValues,
         formState: { errors, isValid },
     } = useForm();
     let emailRegexExp = new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i);
-
     const emailValidation = (email: string) => {
-        console.log("validate email called: " + email);
         return emailRegexExp.test(email);
+    };
+    const passwordsMatch = (password: string, password2: string) => {
+        return password === password2;
     };
 
     return (
@@ -38,7 +40,7 @@ const RegisterForm = ({ onFormSubmit, handleLogin }: RegisterFormProps) => {
                 {errors.username?.type === "required" && <p>This field is required</p>}
                 {errors.username?.type === "minLength" && <p>Username must be at least 4 characters long</p>}
             </div>
-            <div className="mb-3">
+            {/* <div className="mb-3">
                 <label htmlFor="email" className="form-label">
                     Email
                 </label>
@@ -54,7 +56,7 @@ const RegisterForm = ({ onFormSubmit, handleLogin }: RegisterFormProps) => {
                 />
                 {errors.email?.type === "required" && <p>This field is required</p>}
                 {errors.email?.type === "validate" && <p>Please enter a valid email</p>}
-            </div>
+            </div> */}
             <div className="mb-3">
                 <label htmlFor="password" className="form-label">
                     Password
@@ -75,7 +77,8 @@ const RegisterForm = ({ onFormSubmit, handleLogin }: RegisterFormProps) => {
                 <input
                     {...register("password2", {
                         required: true,
-                        validate: (value) => value === "password",
+                        // validate: (value) => value === getValues("password"),
+                        validate: (value) => passwordsMatch(value, getValues("password")),
                     })}
                     id="password2"
                     type="password"

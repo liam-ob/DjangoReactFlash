@@ -64,13 +64,21 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
     const createFlashcard = (data: FieldValues) => {
         data = { ...data, stack_id: stackID };
         const originalFlashcards = [...flashcards];
+
+        var image = "";
+        if (data.answer_img[0]) {
+            image = data.answer_img[0];
+        } else {
+            delete data.answer_img;
+        }
+
         setFlashcards([
             ...flashcards,
             {
                 id: 0,
                 stack_id: stackID,
                 question: data.question,
-                answer_img: data.answer_img,
+                answer_img: image,
                 answer_char: data.answer_char,
                 date_created: "",
                 date_modified: "",
@@ -79,17 +87,16 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
             },
         ]);
 
-        if (data.answer_img[0]) {
-            const formData = new FormData();
-            formData.append("answer_char", data.answer_char);
-            data = { ...data, answer_img: data.answer_img[0].name };
-            formData.append("question", data.question);
-        } else {
-            delete data.answer_img;
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
         }
-        console.log(data);
+        if (image != "") {
+            formData.append("answer_img", image);
+        }
+
         axiosInstance
-            .post(`api/flashcards/flashcards/listcreate/${stackID}/`, data)
+            .post(`api/flashcards/flashcards/listcreate/${stackID}/`, formData)
             .then((res) => {
                 if (res.status === 201) {
                     setFlashcards([res.data, ...flashcards]);
@@ -142,8 +149,7 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
                                 <div className="card-body">
                                     <h5 className="card-title">{flashcard.question}</h5>
                                     <p className="card-text">{flashcard.answer_char}</p>
-                                    {flashcard?.answer_img && <p className="card-text">{flashcard.answer_img}</p>}
-                                    <p className="card-text">Priority : {flashcard.priority_id}</p>
+                                    <p className="card-text">Priority : {flashcard.user_priority}</p>
                                 </div>
                                 <div className="card-footer text-center">
                                     <p>{flashcard.date_modified}</p>

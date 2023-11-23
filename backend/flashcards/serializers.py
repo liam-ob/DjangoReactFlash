@@ -71,7 +71,7 @@ class FlashcardSerializerWithPriority(serializers.Serializer):
     date_created = serializers.DateTimeField(read_only=True, format="%d %b %Y @ %H:%M")
     date_modified = serializers.DateTimeField(required=False, format="%d %b %Y @ %H:%M")
     priority_id = serializers.IntegerField(required=False)
-    user_priority = serializers.IntegerField(required=False)
+    user_priority = serializers.IntegerField(required=True)
 
 
 class PrioritySerializer(serializers.Serializer):
@@ -80,6 +80,9 @@ class PrioritySerializer(serializers.Serializer):
     priority = serializers.IntegerField(required=True)
 
     def is_valid(self, *, raise_exception=False):
+        # make sure priority is more then or equal to 1
+        if self.initial_data.get('priority') < 1:
+            raise serializers.ValidationError({'priority': 'Priority cant go lower then 1.'})
         try:
             Flashcard.objects.get(id=self.initial_data.get('flashcard_id'))
         except Flashcard.DoesNotExist:

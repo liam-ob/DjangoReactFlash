@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { createRoot, Root } from "react-dom/client";
 import Toast, { ToastProps } from "./Toast";
 
 interface ToastOptions {
@@ -12,15 +13,15 @@ interface ToastOptions {
 export class ToastManager {
     private containerRef: HTMLDivElement;
     private toasts: ToastProps[] = [];
+    private root: Root;
 
     constructor() {
-        const body = document.getElementsByTagName(
-            "body"
-        )[0] as HTMLBodyElement;
+        const body = document.getElementsByTagName("body")[0] as HTMLBodyElement;
         const toastContainer = document.createElement("div") as HTMLDivElement;
         toastContainer.id = "toast-container-main";
         body.insertAdjacentElement("beforeend", toastContainer);
         this.containerRef = toastContainer;
+        this.root = createRoot(this.containerRef);
     }
 
     public show(options: ToastOptions): void {
@@ -36,17 +37,15 @@ export class ToastManager {
     }
 
     public destroy(id: string): void {
-        this.toasts = this.toasts.filter(
-            (toast: ToastProps) => toast.id !== id
-        );
+        this.toasts = this.toasts.filter((toast: ToastProps) => toast.id !== id);
         this.render();
     }
 
     private render(): void {
-        const toastsList = this.toasts.map((toastProps: ToastProps) => (
-            <Toast key={toastProps.id} {...toastProps} />
-        ));
-        ReactDOM.render(toastsList, this.containerRef);
+        const toastsList = this.toasts.map((toastProps: ToastProps) => <Toast key={toastProps.id} {...toastProps} />);
+
+        // createRoot(this.containerRef).render(toastsList);
+        this.root.render(toastsList);
     }
 }
 

@@ -27,11 +27,13 @@ JWT_SECRET = os.environ.get('JWT_SECRET', 'bropleasechangeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
-if type(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')) == str:
-    ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
-else:
-    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', ["*"])
-
+try:
+    if type(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]')) == str:
+        ALLOWED_HOSTS = json.loads(os.environ.get('DJANGO_ALLOWED_HOSTS', '["*"]'))
+    else:
+        ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', ["*"])
+except:
+    ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -164,4 +166,12 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'

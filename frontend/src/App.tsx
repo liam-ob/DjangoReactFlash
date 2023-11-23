@@ -7,11 +7,15 @@ import axios from "axios";
 
 function App() {
     var baseURL = "";
-    if (window.location.origin === "http://localhost:3000") {
-        baseURL = "http://127.0.0.1:8000";
+    if (window.location.origin === "http://localhost:5173") {
+        baseURL = "http://localhost:8000";
     } else {
         baseURL = window.location.origin;
     }
+
+    axios.defaults.xsrfCookieName = "csrftoken";
+    axios.defaults.xsrfHeaderName = "X-CSRFToken";
+    axios.defaults.withCredentials = true;
 
     const axiosInstance = axios.create({
         baseURL: baseURL,
@@ -19,7 +23,6 @@ function App() {
             Authorization: `Token ${localStorage.getItem("token")}`,
         },
     });
-    const [stackID, setStackID] = useState<number>(0);
 
     return (
         <div>

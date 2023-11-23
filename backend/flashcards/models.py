@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from django.core.validators import FileExtensionValidator, MaxLengthValidator
 # Create your models here.
 
 
@@ -22,7 +23,8 @@ class Flashcard(models.Model):
     stack = models.ForeignKey(FlashcardStack, on_delete=models.CASCADE)
 
     question = models.TextField()
-    answer_img = models.ImageField(upload_to='images/', blank=True, null=True)
+    answer_img = models.ImageField(upload_to='media/images', blank=True, null=True,
+                                    validators=[FileExtensionValidator(['png', 'jpg', 'jpeg']), MaxLengthValidator(2*1024*1024)])
     answer_char = models.CharField(max_length=1000, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)

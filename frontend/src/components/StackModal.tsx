@@ -20,7 +20,6 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
     }, [start]);
 
     const getNewFlashcard = () => {
-        console.log("getNewFlashcard");
         axiosInstance
             .get(`api/flashcards/flashcards/weightedflashcard/${stackID}/`)
             .then((res) => {
@@ -42,9 +41,6 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                     id: flashcard.priority_id,
                     priority: priorityChange + flashcard.user_priority,
                     flashcard_id: flashcard.id,
-                })
-                .then((res) => {
-                    console.log("response ", res);
                 })
                 .catch((err) => {
                     toast.show({
@@ -75,9 +71,19 @@ const StackModal = ({ axiosInstance, stackID }: StackModalProps) => {
                         <div className="p-4 pt-0">
                             {showAnswer ? (
                                 <>
-                                    <h5>Answer</h5>
-                                    <p>{flashcard?.answer_char}</p>
-                                    <p>{flashcard?.answer_img}</p>
+                                    {flashcard?.answer_char ? (
+                                        <>
+                                            <h5>Answer</h5>
+                                            <p>{flashcard?.answer_char}</p>
+                                            <img
+                                                style={{ maxWidth: "300px" }}
+                                                src={flashcard?.answer_img && "http://127.0.0.1:8000" + flashcard.answer_img}
+                                                alt="image"
+                                            />
+                                        </>
+                                    ) : (
+                                        <p>No Answer</p>
+                                    )}
                                 </>
                             ) : (
                                 <button

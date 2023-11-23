@@ -67,7 +67,11 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
         // provide instant feedback to user by removing flashcardStack from list
         setFlashcardStacks(flashcardStacks.filter((stack) => stack.id != flashcardStack.id));
         axiosInstance.delete("api/flashcards/flashcardstacks/" + flashcardStack.id + "/").catch((err) => {
-            setError(err.message);
+            toast.show({
+                title: "Error",
+                content: "Failed to delete flashcard stack: " + err.message,
+                duration: 5000,
+            });
             setFlashcardStacks(origianalFlashcardStacks);
         });
     };
@@ -96,11 +100,19 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
                     console.log("Flashcard stack created!");
                     setFlashcardStacks([response.data, ...flashcardStacks]);
                 } else if (response.status === 403 || response.status === 401) {
-                    setError("You are not authorized to create a flashcard stack!");
+                    toast.show({
+                        title: "Not Authorised",
+                        content: "Failedto create flashcard stack",
+                        duration: 5000,
+                    });
                 }
             })
             .catch((err) => {
-                setError(err.message);
+                toast.show({
+                    title: "Error",
+                    content: "Failed to create flashcard stack: " + err.message,
+                    duration: 5000,
+                });
                 setFlashcardStacks(originalFlashcardStacks);
             });
     };

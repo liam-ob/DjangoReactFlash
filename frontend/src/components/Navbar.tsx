@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "./toasts/ToastManager";
 import Button from "./Button";
 import Collapsible from "./Collapsible";
 import LoginForm from "./LoginForm";
@@ -25,11 +26,14 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
         axiosInstance
             .post("api/core/users/checklogin/")
             .then((response) => {
-                console.log(response?.data);
                 setUser(response.data);
             })
             .catch((err) => {
-                console.log(err);
+                toast.show({
+                    title: "Error",
+                    content: "User not logged in: " + err.message,
+                    duration: 5000,
+                });
             });
         return () => {
             controller.abort();
@@ -37,35 +41,51 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
     }, []);
 
     const loginUser = (data: FieldValues) => {
-        console.log(data);
         const originalUser = user;
         setUser({ id: data.id, username: data.username });
         axiosInstance
             .post("api/core/users/login/", data)
             .then((response) => {
-                console.log(response);
+                toast.show({
+                    title: "Success",
+                    content: "User logged in",
+                    duration: 5000,
+                });
                 // Make this a jwt token
                 localStorage.setItem("token", response.data.token);
             })
             .catch((err) => {
-                console.log(err);
+                toast.show({
+                    title: "Error",
+                    content: "Couldnt log in user: " + err.message,
+                    duration: 5000,
+                });
                 setUser(originalUser);
             });
     };
 
     const registerUser = (data: FieldValues) => {
-        console.log(data);
         const originalUser = user;
         setUser({ id: data.id, username: data.username });
         axiosInstance
+            // .post("api/core/users/register/", data)
             .post("api/core/users/register/", data)
             .then((response) => {
-                console.log(response);
                 // Make this a jwt token
-                localStorage.setItem("token", response.data.token);
+                toast.show({
+                    title: "Success",
+                    content: "Welcome to DRFlashcards " + data.username + "!",
+                    duration: 5000,
+                });
+                const loginData = { username: data.username, password: data.password };
+                loginUser(loginData);
             })
             .catch((err) => {
-                console.log(err);
+                toast.show({
+                    title: "Error",
+                    content: "Couldnt register user: " + err.message,
+                    duration: 5000,
+                });
                 setUser(originalUser);
             });
     };
@@ -76,11 +96,14 @@ const Navbar = ({ axiosInstance }: NavbarProps) => {
         axiosInstance
             .get("api/core/users/logout/")
             .then((response) => {
-                console.log(response);
+                toast.show({
+                    title: "Success",
+                    content: "Foodbye!",
+                    duration: 5000,
+                });
                 localStorage.removeItem("token");
             })
             .catch((err) => {
-                console.log(err);
                 setUser(originalUser);
             });
     };
