@@ -73,7 +73,9 @@ sudo systemctl daemon-reload
 
 # start nginx
 echo "Starting nginx..."
-sudo ln -s $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
+sudo cp $PROJECT/deployment/nginx.conf /etc/nginx/sites-enabled/DjangoReactFlash
+sudo cp $PROJECT/deployment/nginx.conf /etc/nginx/sites-available/DjangoReactFlash
+sudo cp $PROJECT/deployment/nginx.conf /etc/nginx/nginx.conf
 sudo cp $PROJECT/deployment/nginx.service /etc/systemd/system/nginx.service
 sudo systemctl start nginx
 sudo systemctl enable nginx
