@@ -37,7 +37,7 @@ class RegisterUserAPIView(generics.CreateAPIView):
 
 
 class LoginView(ObtainAuthToken):
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = ()
     def post(self, request, *args, **kwargs):
         resp = super(LoginView, self).post(request, *args, **kwargs)
         token = Token.objects.get(key=resp.data['token'])

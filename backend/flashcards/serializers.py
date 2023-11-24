@@ -12,6 +12,7 @@ class FlashcardStackSerializer(serializers.Serializer):
     difficulty = serializers.CharField(max_length=20)
     date_created = serializers.DateTimeField(read_only=True, required=False, format="%d %b %Y @ %H:%M")
     date_modified = serializers.DateTimeField(required=False, format="%d %b %Y @ %H:%M")
+    user_is_author = serializers.BooleanField(required=False)
 
     def create(self, validated_data):
         return FlashcardStack.objects.create(**validated_data)

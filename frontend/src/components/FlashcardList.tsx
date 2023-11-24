@@ -10,6 +10,7 @@ import MyModal from "./MyModal";
 interface FlashcardListProps {
     axiosInstance: AxiosInstance;
     stackID: number;
+    userIsAuthor?: boolean;
 }
 export interface Flashcard {
     id: number;
@@ -23,7 +24,7 @@ export interface Flashcard {
     user_priority: number;
 }
 
-const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
+const FlashcardList = ({ axiosInstance, stackID, userIsAuthor = false }: FlashcardListProps) => {
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -136,9 +137,13 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
     return (
         <>
             <div className="text-center">
-                <MyModal button_text="Create Flashcard" title="Create Flashcard" size="lg">
-                    <FlashcardForm onFormSubmit={createFlashcard} />
-                </MyModal>
+                {userIsAuthor && (
+                    <>
+                        <MyModal button_text="Create Flashcard" title="Create Flashcard" size="lg">
+                            <FlashcardForm onFormSubmit={createFlashcard} />
+                        </MyModal>
+                    </>
+                )}
             </div>
             {isLoading && <div className="spinner-border"></div>}
             <div className="container">
@@ -159,10 +164,11 @@ const FlashcardList = ({ axiosInstance, stackID }: FlashcardListProps) => {
                                                 <FaTrashAlt />
                                             </button>
                                         </div>
-                                        <div className="col"></div>
-                                        <div className="col-md-auto">
-                                            <button className="btn btn-primary">Edit (not working)</button>
-                                        </div>
+                                        {userIsAuthor && (
+                                            <div className="col-md-auto">
+                                                <button className="btn btn-primary">Edit (not working)</button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

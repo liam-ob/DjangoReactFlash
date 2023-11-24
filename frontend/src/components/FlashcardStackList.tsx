@@ -24,6 +24,7 @@ export interface FlashcardStack {
     difficulty: string;
     date_created: string;
     date_modified: string;
+    user_is_author?: boolean;
 }
 
 const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
@@ -150,17 +151,37 @@ const FlashcardStackList = ({ axiosInstance }: FlashcardStackListProps) => {
                                     <small className="text-muted">Last Updated : {flashcardStack.date_modified}</small>
                                 </p>
 
-                                <div className="text-muted d-flex justify-content-between pb-1">
-                                    Author : {flashcardStack.author.username}
-                                    <button className="btn btn-outline-danger" onClick={() => deleteStack(flashcardStack)}>
-                                        <FaTrashAlt />
-                                    </button>
-                                </div>
+                                <div className="text-muted d-flex justify-content-between pb-1">Author : {flashcardStack.author.username}</div>
                                 <div className="card-footer">
-                                    <div className="text-center">
-                                        <MyModal button_text="edit" title="Flashcards" size="xl">
-                                            <FlashcardList axiosInstance={axiosInstance} stackID={flashcardStack.id} />
-                                        </MyModal>
+                                    <div className="row">
+                                        {flashcardStack.user_is_author ? (
+                                            <>
+                                                <div className="col-9">
+                                                    <MyModal button_text="Edit" title="Flashcards" size="xl">
+                                                        <FlashcardList
+                                                            axiosInstance={axiosInstance}
+                                                            stackID={flashcardStack.id}
+                                                            userIsAuthor={flashcardStack?.user_is_author}
+                                                        />
+                                                    </MyModal>
+                                                </div>
+                                                <div className="col-3 ms-auto">
+                                                    <button className="btn btn-outline-danger" onClick={() => deleteStack(flashcardStack)}>
+                                                        <FaTrashAlt />
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="col-12">
+                                                <MyModal button_text="View" title="Flashcards" size="xl">
+                                                    <FlashcardList
+                                                        axiosInstance={axiosInstance}
+                                                        stackID={flashcardStack.id}
+                                                        userIsAuthor={flashcardStack?.user_is_author}
+                                                    />
+                                                </MyModal>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

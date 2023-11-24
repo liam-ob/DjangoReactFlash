@@ -19,7 +19,11 @@ class FlashcardStackListAllCreateAPIView(views.APIView):
         if request.user.is_anonymous:
             serializer = serializers.FlashcardStackSerializer(FlashcardStack.objects.filter(public=True), many=True)
         else:
-            query = FlashcardStack.objects.filter(Q(public=True) | Q(author=request.user))
+            query = FlashcardStack.objects.filter(Q(public=True) | Q(author=request.user)).annotate(
+                user_is_author=Case(
+                    When(author=request.user, then=True),
+                )
+            )
             serializer = serializers.FlashcardStackSerializer(query, many=True)
         return response.Response(serializer.data)
 
