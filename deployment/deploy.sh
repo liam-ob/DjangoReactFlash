@@ -41,6 +41,8 @@ until cd $PROJECT; do
   sleep 2
 done
 cd $PROJECT
+sudo /root/.local/bin/poetry config virtualenvs.create false
+sudo /root/.local/bin/poetry config virtualenvs.in-project true
 sudo /root/.local/bin/poetry install
 
 # Run the Django migrations
