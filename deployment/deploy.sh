@@ -1,6 +1,8 @@
 
 #!/bin/bash
 
+echo "dont forget to add and run the setenv.sh file"
+
 # Update the system
 echo "Updating apt-get"
 sudo apt-get -qq update

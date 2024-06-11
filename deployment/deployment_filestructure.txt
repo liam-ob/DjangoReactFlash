@@ -1,0 +1,5 @@
+d777 /var
+d777 /var/www
+d777 /var/www/DjangoReactFlash
+d777 /var/www/html
+f777 /var/www/html/index.nginx-debian.html                                  (is this needed?)
